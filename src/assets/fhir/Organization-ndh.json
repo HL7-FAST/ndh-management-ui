@@ -1,0 +1,19 @@
+{
+  "resourceType" : "Organization",
+  "meta": {
+    "profile" : ["http://hl7.org/fhir/us/ndh/StructureDefinition/ndh-Organization"],
+    "security" : [{
+      "system" : "http://terminology.hl7.org/CodeSystem/v3-Confidentiality",
+      "code" : "V"
+    }],
+    "lastUpdated": "1970-01-01T00:00:00.000Z"
+  },
+  "active" : true,
+  "type" : [{
+    "coding" : [{
+      "system" : "http://hl7.org/fhir/us/ndh/CodeSystem/OrgTypeCS",
+      "code" : "fac",
+      "display" : "Facility"
+    }]
+  }]
+}

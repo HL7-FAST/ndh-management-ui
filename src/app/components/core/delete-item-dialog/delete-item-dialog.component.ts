@@ -17,7 +17,7 @@ import { MatIconModule } from '@angular/material/icon';
   styleUrls: ['./delete-item-dialog.component.scss']
 })
 export class DeleteItemDialogComponent implements OnInit {
-  dialogTitle: string = 'Are you sure you want to delete this item';
+  dialogTitle: string = 'Are you sure you want to delete this item?';
   dialogMessage: string = '';
 
   constructor(
@@ -25,8 +25,8 @@ export class DeleteItemDialogComponent implements OnInit {
     private dialogRef: MatDialogRef<DeleteItemDialogComponent>) { }
 
   ngOnInit() {
-    this.dialogTitle = this.data.dialogTitle;
-    this.dialogMessage = this.data.dialogMessage;
+    this.dialogTitle = this.data?.dialogTitle ?? this.dialogTitle;
+    this.dialogMessage = this.data?.dialogMessage ?? this.dialogMessage;
   }
 
   confirmDeletion() {

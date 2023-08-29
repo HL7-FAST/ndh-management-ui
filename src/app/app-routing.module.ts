@@ -7,6 +7,7 @@ const routes: Routes = [
   { path: 'create-resource', loadComponent: () => import('./components/resource/create-resource/create-resource.component').then(comp => comp.CreateResourceComponent)},
   { path: 'update-resource', loadComponent: () => import('./components/resource/update-resource/update-resource.component').then(comp => comp.UpdateResourceComponent)},
   { path: 'delete-resource', loadComponent: () => import('./components/resource/delete-resource/delete-resource.component').then(comp => comp.DeleteResourceComponent)},
+  { path: 'organization-list', loadComponent: () => import('./components/organization/organization-list/organization-list.component').then(comp => comp.OrganizationListComponent) },
   { path: 'patient-list', loadComponent: () => import('./components/patient/patient-list/patient-list.component').then(comp => comp.PatientListComponent) },
   { path: 'patient-match', loadComponent: () => import('./components/patient/patient-match/patient-match.component').then(comp => comp.PatientMatchComponent) },
   { path: 'capability-statement', loadComponent: () => import('./components/capability-statement/capability-statement.component').then(comp => comp.CapabilityStatementComponent) },

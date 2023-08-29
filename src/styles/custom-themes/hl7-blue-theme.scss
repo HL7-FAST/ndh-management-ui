@@ -4,14 +4,15 @@
 
 $my-primary: mat.define-palette(hl7Blue.$hl7-blue-primary, 700, 500, 300);
 $my-accent: mat.define-palette(hl7Blue.$hl7-blue-accent, 600, 400, 200);
-//$my-warn: mat.define-palette(hl7Blue.$hl7-blue-warn, 400);
+$my-warn: mat.define-palette(hl7Blue.$hl7-blue-warn, 400);
 
 $hl7-blue-theme: mat.define-light-theme((
     color: (
       primary: $my-primary,
       accent: $my-accent,
-      //warn: $my-warn
-    )
+      warn: $my-warn
+    ),
+    typography: mat.define-typography-config()
   ));
 
 @include mat.all-component-themes($hl7-blue-theme);
@@ -26,15 +27,16 @@ $hl7-blue-theme: mat.define-light-theme((
 
 $my-primary-dark: mat.define-palette(hl7Blue.$hl7-blue-primary, 900, 700, 500);
 $my-accent-dark: mat.define-palette(hl7Blue.$hl7-blue-accent, 900, 700, 500);
-//$my-warn-dark: mat.define-palette(hl7Blue.$hl7-blue-warn, 900);
+$my-warn-dark: mat.define-palette(hl7Blue.$hl7-blue-warn, 900);
 
 
 $hl7-blue-dark-theme: mat.define-dark-theme((
     color: (
       primary: $my-primary-dark,
       accent: $my-accent-dark,
-      //warn: $my-warn-dark
-    )
+      warn: $my-warn-dark
+    ),
+    typography: mat.define-typography-config()
   ));
 
 .hl7-blue-dark {

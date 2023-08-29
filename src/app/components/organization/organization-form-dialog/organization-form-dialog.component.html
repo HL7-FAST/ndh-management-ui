@@ -1,0 +1,155 @@
+<h1 mat-dialog-title class="dialog-form-header" style="display: flex; align-items: center;">
+  <div>{{data.dialogTitle}}</div>
+
+  <span style="flex: 1 1 auto;"></span>
+
+  <mat-icon color="primary" matTooltip="Previously Attested" *ngIf="isAttested(organization)" style="margin-left: 0.5em;">verified</mat-icon>
+
+  <button *ngIf="!isAttested(organization) && formMode === FormMode.Edit" mat-raised-button extended color="primary" style="margin: 0.25em" (click)="markAttested()">
+    <mat-icon>check</mat-icon>
+    Mark as Attested
+  </button>
+</h1>
+<div mat-dialog-content>
+  <form [formGroup]="organizationForm" class="dialog-form">
+
+    <div class="input-container">
+      <mat-form-field appearance="outline" class="form-input" style="width: 50%;">
+        <mat-label>Id</mat-label>
+        <input matInput formControlName="id">
+        <mat-error *ngIf="idControl.hasError('required')">
+          Id is <strong>required</strong>
+        </mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="input-container">
+      <mat-form-field appearance="outline" class="form-input" style="width: 75%;">
+        <mat-label>Name</mat-label>
+        <input matInput formControlName="name">
+        <mat-error *ngIf="nameControl.hasError('required')">
+          Name is <strong>required</strong>
+        </mat-error>
+      </mat-form-field>
+    </div>
+
+
+    <h4>Organization's Addess(es)</h4>
+    <div formArrayName="address">
+      <div *ngFor="let address of addressForms.controls; let i=index">
+        <div class="input-container" [formGroupName]="i">
+          <mat-form-field appearance="outline">
+            <mat-label>Address</mat-label>
+            <input matInput formControlName="line" placeholder="Ex. 100 Main St">
+          </mat-form-field>
+        
+          <mat-form-field appearance="outline">
+            <mat-label>City</mat-label>
+            <input matInput formControlName="city" placeholder="Ex. San Francisco">
+          </mat-form-field>
+  
+          <mat-form-field appearance="outline">
+            <mat-label>State</mat-label>
+            <input matInput formControlName="state" placeholder="Ex. California">
+          </mat-form-field>
+  
+          <mat-form-field appearance="outline">
+            <mat-label>Postal Code</mat-label>
+            <input matInput #postalCode formControlName="postalCode" placeholder="Ex. 94105">
+          </mat-form-field>
+        
+          <button mat-icon-button aria-label="Remove address" (click)="removeAddress(i)">
+            <mat-icon>delete_outline</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+    <button mat-icon-button aria-label="Add a new organization address" (click)="addAddress()">
+      <mat-icon>add_box</mat-icon>
+    </button>
+
+
+    <h4>Organization Telecom(s)</h4>
+    <div formArrayName="telecom">
+      <div *ngFor="let telecom of telecomForms.controls; let i=index">
+        <div class="input-container" [formGroupName]="i">
+          <mat-form-field class="form-select" appearance="outline">
+            <mat-label>System</mat-label>
+            <mat-select formControlName="system" [compareWith]="compareContactPoints">
+              <mat-option>None</mat-option>
+              <mat-option *ngFor="let system of telecomSystems" [value]="system">
+                {{system}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field class="form-select" appearance="outline">
+            <mat-label>Use</mat-label>
+            <mat-select formControlName="use" [compareWith]="compareContactPoints">
+              <mat-option>None</mat-option>
+              <mat-option *ngFor="let use of telecomUseCases" [value]="use">
+                {{use}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Value</mat-label>
+            <input matInput formControlName="value">
+          </mat-form-field>
+
+          <button mat-icon-button aria-label="Remove telecom" (click)="removeTelecom(i)">
+            <mat-icon>delete_outline</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+    <button mat-icon-button aria-label="Add a new organization telecom" (click)="addTelecom()">
+      <mat-icon>add_box</mat-icon>
+    </button>
+
+
+
+    <h4>Organization Identifier(s)</h4>
+    <div formArrayName="identifier">
+      <div *ngFor="let identifier of identifierForms.controls; let i=index">
+        <div class="input-container" [formGroupName]="i">
+            <mat-form-field class="form-select" appearance="outline">
+                <mat-label>Type</mat-label>
+                <mat-select formControlName="type" [compareWith]="compareIdentifierTypes">
+                    <mat-option>None</mat-option>
+                    <mat-option *ngFor="let type of identifierTypes" [value]="type.value">
+                        {{type.key}}
+                    </mat-option>
+                </mat-select>                    
+            </mat-form-field>  
+
+            <mat-form-field appearance="outline">
+                <mat-label>System</mat-label>
+                <input matInput formControlName="system">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Value</mat-label>
+                <input matInput formControlName="value">
+            </mat-form-field>
+
+            <button mat-icon-button aria-label="Remove organization identifier" (click)="removeIdentifier(i)">
+                <mat-icon>delete_outline</mat-icon>           
+            </button>
+        </div>
+      </div>
+    </div>
+    <button mat-icon-button aria-label="Add a new organization identifier" (click)="addIdentifier()">
+        <mat-icon>add_box</mat-icon>          
+    </button>
+
+  </form>
+</div>
+<div mat-dialog-actions align="end">
+  <button mat-raised-button color="primary" [disabled]="organizationForm.invalid" (click)="onSubmit()">
+    <mat-icon>{{ formMode == FormMode.Create ? 'save' : 'save_as'}}</mat-icon>
+    {{ formMode == FormMode.Create ? 'Create' : 'Update'}} Organization
+  </button>
+  <button mat-raised-button mat-dialog-close>Close</button>
+</div>

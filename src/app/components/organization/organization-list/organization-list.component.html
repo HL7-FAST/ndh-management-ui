@@ -1,0 +1,60 @@
+<div class="content">
+  <p>
+    <mat-toolbar class="page-header-bar" color="primary">
+      <span>Organizations</span>
+      <button mat-mini-fab aria-label="Create a new organization dialog" matTooltip="Create Organization" (click)="showCreateOrganizationDialog()">
+        <mat-icon>add</mat-icon>
+      </button>
+    </mat-toolbar>
+  </p>
+
+
+  <div class="table-container" *ngIf="organizations && organizations.length > 0; else no_organizations_found">
+    <table mat-table [dataSource]="organizations">
+
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef>FHIR ID</th>
+        <td mat-cell *matCellDef="let organization">{{organization.id}}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef>Name</th>
+        <td mat-cell *matCellDef="let organization">{{organization.name}}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="attested">
+        <th mat-header-cell *matHeaderCellDef>Attested</th>
+        <td mat-cell *matCellDef="let organization"><mat-icon *ngIf="isAttested(organization)">verified</mat-icon></td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef aria-label="row actions">&nbsp;</th>
+        <td mat-cell *matCellDef="let record">
+          <button mat-icon-button class="row-expansion-btn" (click)="showDeleteOrganizationDialog($event, record)">
+            <mat-icon>delete</mat-icon>
+          </button>
+          <button mat-icon-button class="row-expansion-btn" (click)="showEditOrganizationDialog($event, record)">
+            <mat-icon>edit</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="showOrganizationViewDialog($event, row)"></tr>
+
+    </table>
+    <mat-paginator [length]="totalCount"
+                [pageIndex]="pageNumber"
+                [pageSize]="pageSize"
+                [pageSizeOptions]="[5, 10, 20, 50]"
+                (page)="pagedEvent($event)"                 
+                aria-label="Select page of organizations">
+    </mat-paginator> 
+  </div>
+  <ng-template #no_organizations_found>
+    <div class="no-results-found-container">
+      <span>No organizations found.</span>
+    </div>    
+  </ng-template>
+
+</div>

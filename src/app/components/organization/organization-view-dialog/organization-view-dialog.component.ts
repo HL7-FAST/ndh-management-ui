@@ -7,9 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { Organization, Patient } from 'fhir/r4';
-import { PatientService } from 'src/app/services/patient.service';
-import { PatientViewDialogComponent } from '../../patient/patient-view-dialog/patient-view-dialog.component';
+import { Organization } from 'fhir/r4';
 import { OrganizationService } from 'src/app/services/organization.service';
 
 @Component({

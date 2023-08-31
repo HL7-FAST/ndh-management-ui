@@ -64,6 +64,10 @@
         </mat-expansion-panel>
       </mat-accordion>
 
+      <a mat-list-item routerLink="endpoint-list" routerLinkActive="active">
+        <mat-icon matListItemIcon [ngClass]="{'close-menu-icon' : !showMenuText}">api</mat-icon>
+        <div class="side-nav-menu-title" matListItemTitle *ngIf="showMenuText">Endpoint</div>
+      </a>
       <a mat-list-item routerLink="organization-list" routerLinkActive="active">
         <mat-icon matListItemIcon [ngClass]="{'close-menu-icon' : !showMenuText}">medical_services</mat-icon>
         <div class="side-nav-menu-title" matListItemTitle *ngIf="showMenuText">Organization</div>

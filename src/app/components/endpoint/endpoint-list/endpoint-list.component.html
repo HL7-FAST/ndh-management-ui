@@ -1,0 +1,62 @@
+<div class="content">
+  <p>
+    <mat-toolbar class="page-header-bar" color="primary">
+      <span>Endpoints</span>
+      <button mat-mini-fab aria-label="Create a new endpoint dialog" matTooltip="Create Endpoint" 
+        [disabled]="!selectedOrganizationId || selectedOrganizationId.length < 1" (click)="showCreateEndpointDialog()">
+        <mat-icon>add</mat-icon>
+      </button>
+    </mat-toolbar>
+  </p>
+
+  <mat-form-field>
+    <mat-label>Organization</mat-label>
+    <mat-select [(value)]="selectedOrganizationId" (selectionChange)="getEndpoints()">
+      <mat-option *ngFor="let org of organizations" [value]="org.id">
+        {{org.name || org.id}}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <div class="table-container" *ngIf="endpoints && endpoints.length > 0; else no_endpoints_found">
+    <table mat-table [dataSource]="endpoints">
+
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef>FHIR ID</th>
+        <td mat-cell *matCellDef="let endpoint">{{endpoint.id}}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef>Name</th>
+        <td mat-cell *matCellDef="let endpoint">{{endpoint.name}}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="attested">
+        <th mat-header-cell *matHeaderCellDef>Attested</th>
+        <td mat-cell *matCellDef="let endpoint"><mat-icon *ngIf="isAttested(endpoint)">verified</mat-icon></td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef aria-label="row actions">&nbsp;</th>
+        <td mat-cell *matCellDef="let record">
+          <button mat-icon-button class="row-expansion-btn" (click)="showDeleteEndpointDialog($event, record)">
+            <mat-icon>delete</mat-icon>
+          </button>
+          <button mat-icon-button class="row-expansion-btn" (click)="showEditEndpointDialog($event, record)">
+            <mat-icon>edit</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="showEndpointViewDialog($event, row)"></tr>
+      
+    </table>
+  </div>
+  <ng-template #no_endpoints_found>
+    <div class="no-results-found-container">
+      <span>No endpoints associated with &quot;<strong>Organization/{{ this.selectedOrganizationId }}</strong>&quot;</span>
+    </div>    
+  </ng-template>
+
+</div>

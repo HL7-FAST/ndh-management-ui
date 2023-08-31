@@ -117,33 +117,42 @@ export class ResourceService {
   }
 
 
-  async getAllIds(resourceType: string, queryString: string): Promise<string[]> {
+  protected async getNext(url: string): Promise<Resource[]> {
+    const resources: Resource[] = [];
+    let res = await firstValueFrom(this.http.get<Bundle<any>>(url));
+    resources.push(...(res.entry || []).map(r => r.resource));
 
-    const getNext = async (url: string): Promise<string[]> => {
-      const ids: string[] = [];
-      let res = await firstValueFrom(this.http.get<Bundle<any>>(url));
-      ids.push(...(res.entry || []).map(r => r.resource.id as string));
-
-      if (res.link) {
-        const next = res.link.find(l => l.relation === 'next');
-        if (next) {
-          console.log('next:', next);
-          ids.push(... await getNext(next.url));
-        }
+    if (res.link) {
+      const next = res.link.find(l => l.relation === 'next');
+      if (next) {
+        console.log('next:', next);
+        resources.push(... await this.getNext(next.url));
       }
-
-      return ids;
     }
+
+    return resources;
+  }
+
+  async getAll(resourceType: string, queryString: string): Promise<any[]> {
+    if (!queryString.startsWith('?')) {
+      queryString = `?${queryString}`;
+    }
+    const requestUrl = `${this.baseApiUrl}/${resourceType}${queryString}`;
+    return await this.getNext(requestUrl);
+  }
+  
+  async getAllIds(resourceType: string, queryString: string): Promise<string[]> {
 
     if (!queryString.startsWith('?')) {
       queryString = `?${queryString}`;
     }
-    let requestUrl = `${this.baseApiUrl}/${resourceType}${queryString}`;
-    return await getNext(requestUrl);
+    const requestUrl = `${this.baseApiUrl}/${resourceType}${queryString}`;
+    const res = await this.getNext(requestUrl);
+    return (res || []).map(r => r.id as string);
   }
 
 
-  metaAdd(resourceType: string, resourceId: string, valueMeta: Meta) {
+  metaAdd(resourceType: string, resourceId: string, valueMeta: Meta): Observable<any> {
 
     let url = `${this.baseApiUrl}/${resourceType}/${resourceId}/$meta-delete`;
 
@@ -159,7 +168,7 @@ export class ResourceService {
 
   }
 
-  metaDelete(resourceType: string, resourceId: string, valueMeta: Meta) {
+  metaDelete(resourceType: string, resourceId: string, valueMeta: Meta): Observable<any> {
 
     let url = `${this.baseApiUrl}/${resourceType}/${resourceId}/$meta-delete`;
 

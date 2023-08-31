@@ -3,6 +3,7 @@ import { FormArray, FormControl, FormGroup, Validators } from "@angular/forms";
 import {
   Address,
   CodeableConcept,
+  Coding,
   ContactPoint,
   DomainResource,
   Identifier,
@@ -89,6 +90,43 @@ export class FhirFormUtils {
     const groups: FormGroup[] = [];
     (addresses || []).forEach((a: Address) => {
       groups.push(this.getAddressFormGroup(a, required));
+    });
+    return new FormArray(groups);
+  }
+
+  static getCodeableConceptFormGroup(codeableConcept?: CodeableConcept, required = true): FormGroup {
+    const contactFormGroup = new FormGroup({
+      coding: FhirFormUtils.getCodingFormArray(codeableConcept?.coding, required),
+      text: new FormControl(codeableConcept ? codeableConcept.text : "", required ? Validators.required : null)
+    });
+
+    return contactFormGroup;
+  }
+
+  static getCodeableConceptFormArray(codeableConcept?: CodeableConcept[], required = true): FormArray {
+    const groups: FormGroup[] = [];
+    (codeableConcept || []).forEach((c: CodeableConcept) => {
+      groups.push(this.getCodeableConceptFormGroup(c, required));
+    });
+    return new FormArray(groups);
+  }
+
+  static getCodingFormGroup(coding?: Coding, required = true): FormGroup {
+    const contactFormGroup = new FormGroup({
+      system: new FormControl(coding ? coding.system : "", required ? Validators.required : null),
+      version: new FormControl(coding ? coding.version : "", required ? Validators.required : null),
+      code: new FormControl(coding ? coding.code : "", required ? Validators.required : null),
+      display: new FormControl(coding ? coding.display : "", required ? Validators.required : null),
+      userSelected: new FormControl(coding ? coding.userSelected : false, required ? Validators.required : null)
+    });
+
+    return contactFormGroup;
+  }
+
+  static getCodingFormArray(codings?: Coding[], required = true): FormArray {
+    const groups: FormGroup[] = [];
+    (codings || []).forEach((c: Coding) => {
+      groups.push(this.getCodingFormGroup(c, required));
     });
     return new FormArray(groups);
   }

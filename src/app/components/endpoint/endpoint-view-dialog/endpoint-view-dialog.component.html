@@ -1,0 +1,65 @@
+<h1 mat-dialog-title class="dialog-form-header" style="display: flex; align-items: center;">
+  <div>{{ data.dialogTitle }}</div>
+  <span style="flex: 1 1 auto;"></span>
+
+  <mat-icon color="primary" matTooltip="Previously Attested" *ngIf="isAttested(endpoint)" style="margin-left: 0.5em;">verified</mat-icon>
+</h1>
+<div mat-dialog-content>
+  <div>
+    <mat-card class="resource-card">
+      <mat-card-content>
+        <div class="input-container">
+          <div>
+            <p><strong>ID:</strong> {{ endpoint.id }}</p>
+            <p><strong>Name:</strong> {{ endpoint.name }}</p>
+            <p><strong>Address:</strong> {{ endpoint.address }}</p>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <div>
+    <p><strong>Telecom(s):</strong></p>
+    <mat-card class="resource-card">
+      <mat-card-content>
+        <div class="input-container" *ngFor="let telecom of endpoint.contact">
+          <p><strong>System:</strong> {{ telecom.system }}</p>
+          <p><strong>Use:</strong> {{telecom.use}}</p>
+          <p><strong>Value:</strong> {{ telecom.value }}</p>
+        </div> 
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <div>
+    <p><strong>Connection Type:</strong></p>
+    <mat-card class="resource-card">
+      <mat-card-content>
+        <div class="input-container">
+          <p><strong>System:</strong> {{ endpoint.connectionType.system }}</p>
+          <p><strong>Code:</strong> {{ endpoint.connectionType.code }}</p>
+        </div> 
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <div>
+    <p><strong>Payload Type(s):</strong></p>
+    <mat-card class="resource-card">
+      <mat-card-content>
+        <div class="input-container" *ngFor="let payloadType of endpoint.payloadType">
+          <p *ngIf="payloadType.text"><strong>Text:</strong> {{ payloadType.text }}</p>
+          <div *ngFor="let coding of payloadType.coding">
+            <p><strong>System:</strong> {{ coding.system }}</p>
+            <p><strong>Version:</strong> {{ coding.version }}</p>
+            <p><strong>Code:</strong> {{ coding.code }}</p>
+            <p><strong>Display:</strong> {{ coding.display }}</p>
+            <p><strong>User Selected:</strong> {{ coding.userSelected }}</p>
+          </div>
+        </div> 
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+</div>

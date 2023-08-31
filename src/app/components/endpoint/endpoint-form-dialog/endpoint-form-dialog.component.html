@@ -1,0 +1,154 @@
+<h1 mat-dialog-title class="dialog-form-header" style="display: flex; align-items: center;">
+  <div>{{data.dialogTitle}}</div>
+
+  <span style="flex: 1 1 auto;"></span>
+
+  <mat-icon color="primary" matTooltip="Previously Attested" *ngIf="isAttested(endpoint)" style="margin-left: 0.5em;">verified</mat-icon>
+
+  <button *ngIf="!isAttested(endpoint) && formMode === FormMode.Edit" mat-raised-button extended color="primary" style="margin: 0.25em" (click)="markAttested()">
+    <mat-icon>check</mat-icon>
+    Mark as Attested
+  </button>
+</h1>
+<div mat-dialog-content>
+  <form [formGroup]="endpointForm" class="dialog-form">
+
+    <div class="input-container">
+      <mat-form-field appearance="outline" class="form-input" style="width: 25%;">
+        <mat-label>Id</mat-label>
+        <input matInput formControlName="id">
+        <mat-error *ngIf="idControl.hasError('required')">
+          Id is <strong>required</strong>
+        </mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="input-container">
+      <mat-form-field appearance="outline" class="form-input" style="width: 75%;">
+        <mat-label>Name</mat-label>
+        <input matInput formControlName="name">
+        <mat-error *ngIf="nameControl.hasError('required')">
+          Name is <strong>required</strong>
+        </mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="input-container">
+      <mat-form-field appearance="outline" class="form-input" style="width: 75%;">
+        <mat-label>Address</mat-label>
+        <input matInput formControlName="address">
+        <mat-error *ngIf="addressControl.hasError('required')">
+          Address is <strong>required</strong>
+        </mat-error>
+      </mat-form-field>
+    </div>
+
+    <h4>Endpoint Contact(s)</h4>
+    <div formArrayName="contact">
+      <div *ngFor="let telecom of contactForms.controls; let i=index">
+        <div class="input-container" [formGroupName]="i">
+          <mat-form-field class="form-select" appearance="outline">
+            <mat-label>System</mat-label>
+            <mat-select formControlName="system" [compareWith]="compareContactPoints">
+              <mat-option>None</mat-option>
+              <mat-option *ngFor="let system of contactSystems" [value]="system">
+                {{system}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field class="form-select" appearance="outline">
+            <mat-label>Use</mat-label>
+            <mat-select formControlName="use" [compareWith]="compareContactPoints">
+              <mat-option>None</mat-option>
+              <mat-option *ngFor="let use of contactUseCases" [value]="use">
+                {{use}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Value</mat-label>
+            <input matInput formControlName="value">
+          </mat-form-field>
+
+          <button mat-icon-button aria-label="Remove contact" (click)="removeContact(i)">
+            <mat-icon>delete_outline</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+    <button mat-icon-button aria-label="Add a new organization contact" (click)="addContact()">
+      <mat-icon>add_box</mat-icon>
+    </button>
+
+    <h4>Connection Type</h4>
+    <div class="input-container" formGroupName="connectionType">
+      <mat-form-field appearance="outline" class="form-input">
+        <mat-label>System</mat-label>
+        <input matInput formControlName="system">
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="form-input">
+        <mat-label>Code</mat-label>
+        <input matInput formControlName="code">
+      </mat-form-field>
+    </div>
+
+    <h4>Payload Type</h4>
+    <div formArrayName="payloadType">
+      <div *ngFor="let payloadType of payloadTypeForms.controls; let i=index">
+        <div [formGroupName]="i">
+
+          <div class="input-container">
+            <mat-form-field appearance="outline">
+              <mat-label>Text</mat-label>
+              <input matInput formControlName="text">
+            </mat-form-field>
+          </div>
+
+          <div class="input-container">
+            <div formArrayName="coding">
+              <div *ngFor="let coding of getCodingForms(i).controls; let j=index">
+                <div [formGroupName]="j">
+                  <div class="input-container">
+                    <mat-form-field appearance="outline" class="form-input">
+                      <mat-label>System</mat-label>
+                      <input matInput formControlName="system">
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline" class="form-input">
+                      <mat-label>Code</mat-label>
+                      <input matInput formControlName="code">
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline" class="form-input">
+                      <mat-label>Version</mat-label>
+                      <input matInput formControlName="version">
+                    </mat-form-field>
+                  </div>
+
+                  <div class="input-container">
+                    <mat-form-field appearance="outline" class="form-input">
+                      <mat-label>Display</mat-label>
+                      <input matInput formControlName="display">
+                    </mat-form-field>
+
+                    <mat-checkbox matInput formControlName="userSelected" class="form-input">User Selected</mat-checkbox>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+<div mat-dialog-actions align="end">
+  <button mat-raised-button color="primary" [disabled]="endpointForm.invalid" (click)="onSubmit()">
+    <mat-icon>{{ formMode == FormMode.Create ? 'save' : 'save_as'}}</mat-icon>
+    {{ formMode == FormMode.Create ? 'Create' : 'Update'}} Endpoint
+  </button>
+  <button mat-raised-button mat-dialog-close>Close</button>
+</div>

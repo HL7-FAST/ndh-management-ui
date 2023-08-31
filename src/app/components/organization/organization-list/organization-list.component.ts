@@ -42,7 +42,6 @@ export class OrganizationListComponent {
   currentPractioner: string;
   nextLink: string = '';
   prevLink: string = '';
-  organizationBundle!: Bundle<PractitionerRole|Organization>;
   organizations: Array<Organization> = [];
   paginationMetadata: PaginationMetadata = new PaginationMetadata;
 
@@ -58,8 +57,8 @@ export class OrganizationListComponent {
   }
 
   getOrganizations(queryString: string) {
+    this.organizations = [];
     this.organizationService.searchResource('PractitionerRole', queryString).subscribe((data: Bundle<PractitionerRole|Organization>) => {
-      this.organizationBundle = data;
       this.organizations = (data.entry || [])
         .filter(e => e.search?.mode === 'include' && e.resource?.resourceType === 'Organization')
         .map(e => e.resource as Organization);

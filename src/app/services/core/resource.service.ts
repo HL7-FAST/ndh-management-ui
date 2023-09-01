@@ -1,22 +1,25 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, catchError, filter, firstValueFrom, map, tap } from 'rxjs';
-import { environment } from 'src/environments/environment';
 import { ErrorHandlingService } from './error-handling.service';
 import { Bundle, CapabilityStatement, Meta, OperationOutcome, Parameters, Resource } from 'fhir/r4';
+import { ConfigService } from '../config.service';
 
 @Injectable({
   providedIn: "root",
 })
 export class ResourceService {
-  protected baseApiUrl = `${environment.baseApiUrl}`;
+  protected baseApiUrl: string;
 
   protected availableResources: string[] = ["Endpoint", "Organization"];
 
   constructor(
     protected http: HttpClient,
-    protected errorHandler: ErrorHandlingService
-  ) {}
+    protected errorHandler: ErrorHandlingService,
+    protected configService: ConfigService
+  ) {
+    this.baseApiUrl = this.configService.baseApiUrl;
+  }
 
   get AvailableResources(): string[] {
     return this.availableResources;

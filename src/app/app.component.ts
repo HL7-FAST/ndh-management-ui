@@ -4,6 +4,10 @@ import { Breakpoints, BreakpointObserver } from '@angular/cdk/layout';
 import { Observable, map, shareReplay } from 'rxjs';
 import { UserProfileService } from './services/core/user-profile.service';
 import { AuthenticationService } from './services/auth/authentication.service';
+import { ConfigService } from './services/config.service';
+import { MatDialog } from '@angular/material/dialog';
+import { SettingsDialogComponent } from './components/core/settings-dialog/settings-dialog.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-root',
@@ -21,11 +25,11 @@ export class AppComponent {
       shareReplay()
     );
 
-  constructor(private breakpointObserver: BreakpointObserver, private authService: AuthenticationService, private profileService: UserProfileService) {
+  constructor(private breakpointObserver: BreakpointObserver, private authService: AuthenticationService, private profileService: UserProfileService, private dialog: MatDialog, private router: Router) {
 
     this.profileService.userProfileUpdated.subscribe(profile => {
       this.userProfile = profile;
-    });    
+    });
 
   }
 
@@ -39,6 +43,18 @@ export class AppComponent {
 
   toggleMenuText() {
     this.showMenuText = !this.showMenuText;
+  }
+
+
+  showSettingsDialog($event: Event) {
+
+    $event.stopPropagation();
+
+    this.dialog.open(SettingsDialogComponent, {}).afterClosed().subscribe(res => {
+      if (res) {
+        window.location.reload();
+      }
+    });
   }
 
 }

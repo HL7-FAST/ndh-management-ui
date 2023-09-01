@@ -1,0 +1,38 @@
+<h1 mat-dialog-title class="dialog-form-header" style="display: flex; align-items: center;">
+  <div>NDH Client Settings</div>
+  <span style="flex: 1 1 auto;"></span>
+
+  <button mat-raised-button extended color="primary" style="margin: 0.25em" (click)="reset()">
+    <mat-icon>restore</mat-icon>
+    Restore default settings
+  </button>
+</h1>
+<div mat-dialog-content>
+  <form [formGroup]="settingsForm" class="dialog-form">
+
+    <div class="input-container">
+      <mat-form-field appearance="outline" class="form-input">
+        <mat-label>NDH FHIR Server</mat-label>
+        <input matInput formControlName="baseApiUrl">
+        <mat-error *ngIf="baseApiUrlControl.hasError('required')">
+          URL is <strong>required</strong>
+        </mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="input-container">
+      <mat-slide-toggle color="primary" formControlName="includeUnattested">
+        Include unattested resources
+      </mat-slide-toggle>
+    </div>
+
+  </form>
+</div>
+<div mat-dialog-actions align="end">
+  <button mat-raised-button color="primary" matTooltip="Save settings and reload page"
+          [disabled]="settingsForm.invalid || !settingsForm.dirty" (click)="save()">
+    <mat-icon>save</mat-icon>
+    Save
+  </button>
+  <button mat-raised-button mat-dialog-close>Close</button>
+</div>

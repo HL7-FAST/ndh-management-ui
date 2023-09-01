@@ -10,7 +10,9 @@
   <span class="toolbar-divider">National Directory of Healthcare Providers &amp; Services</span>
   <span class="example-spacer"></span>
   <span class="toolbar-divider">
-    <app-auth-bypass></app-auth-bypass>
+    <button mat-icon-button matTooltip="Change local client settings" (click)="showSettingsDialog($event)">
+      <mat-icon>settings</mat-icon>
+    </button>
   </span>
   <span class="toolbar-divider">
     <theme-picker></theme-picker>
@@ -43,7 +45,10 @@
       <mat-accordion>
         <mat-expansion-panel style="box-shadow: none">
           <mat-expansion-panel-header style="margin-left: -8px">
-            <mat-panel-title> <mat-icon>category</mat-icon>&nbsp;Resource </mat-panel-title>
+            <mat-panel-title>
+              <mat-icon>category</mat-icon>
+              <div class="side-nav-menu-title" matListItemTitle *ngIf="showMenuText">Resource</div>
+            </mat-panel-title>
           </mat-expansion-panel-header>
           <a mat-list-item routerLink="view-resource" routerLinkActive="active">
             <mat-icon matListItemIcon>search</mat-icon>
@@ -72,18 +77,18 @@
         <mat-icon matListItemIcon [ngClass]="{'close-menu-icon' : !showMenuText}">medical_services</mat-icon>
         <div class="side-nav-menu-title" matListItemTitle *ngIf="showMenuText">Organization</div>
       </a>
-      <a mat-list-item routerLink="patient-list" routerLinkActive="active">
+      <!-- <a mat-list-item routerLink="patient-list" routerLinkActive="active">
         <mat-icon matListItemIcon [ngClass]="{'close-menu-icon' : !showMenuText}">personal_injury</mat-icon>
         <div class="side-nav-menu-title" matListItemTitle *ngIf="showMenuText">Patient</div>
-      </a>
+      </a> -->
       <a mat-list-item routerLink="capability-statement" routerLinkActive="active">
         <mat-icon matListItemIcon [ngClass]="{'close-menu-icon' : !showMenuText}">description</mat-icon>
         <div class="side-nav-menu-title" matListItemTitle *ngIf="showMenuText">Capability Statement</div>
       </a>      
-      <a mat-list-item routerLink="themes" routerLinkActive="active">
+      <!-- <a mat-list-item routerLink="themes" routerLinkActive="active">
         <mat-icon matListItemIcon [ngClass]="{'close-menu-icon' : !showMenuText}">palette</mat-icon>
         <div class="side-nav-menu-title" matListItemTitle *ngIf="showMenuText">Themes</div>
-      </a>
+      </a> -->
     </mat-nav-list>
   </mat-drawer>
   <mat-drawer-content class="main-content">

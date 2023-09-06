@@ -15,7 +15,8 @@ export class UserProfileService {
 
   public userList: Array<UserProfile> = [
     new UserProfile('HandleAttestation', 'handle@attestation.com', 'Test', 'User1', [''], [''], ['']),
-    new UserProfile('HandleAttestation2', 'handle2@attestation.com', 'Test', 'User2', [''], [''], [''])
+    new UserProfile('HandleAttestation2', 'handle2@attestation.com', 'Test', 'User2', [''], [''], ['']),
+    new UserProfile('HandleAttestation3', 'handle3@attestation.com', 'Test', 'User3', [''], [''], [''])
   ];
 
   //private oauthService: OAuthService
@@ -24,7 +25,6 @@ export class UserProfileService {
   }
 
   setProfile(profile: IUserProfile) {
-    console.log('setProfile:', profile);
     this.sessionStorageSrv.storeItem(this.profileKey, JSON.stringify(profile));
     this.userProfileUpdated.next(profile);
   }

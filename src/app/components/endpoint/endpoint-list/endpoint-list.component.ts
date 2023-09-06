@@ -18,23 +18,25 @@ import { EndpointViewDialogComponent } from '../endpoint-view-dialog/endpoint-vi
 import { EndpointFormDialogComponent } from '../endpoint-form-dialog/endpoint-form-dialog.component';
 import { IUserProfile } from 'src/app/interfaces/user-profile.interface';
 import { UserProfileService } from 'src/app/services/core/user-profile.service';
+import { AttestedFilterWarningComponent } from "../../core/attested-filter-warning/attested-filter-warning.component";
 
 @Component({
-  selector: 'app-endpoint-list',
-  standalone: true,
-  imports: [
-    CommonModule,
-    MatButtonModule,
-    MatDialogModule,
-    MatIconModule,
-    MatPaginatorModule,
-    MatSelectModule,
-    MatTableModule,
-    MatSnackBarModule,
-    MatToolbarModule
-  ],
-  templateUrl: './endpoint-list.component.html',
-  styleUrls: ['./endpoint-list.component.scss']
+    selector: 'app-endpoint-list',
+    standalone: true,
+    templateUrl: './endpoint-list.component.html',
+    styleUrls: ['./endpoint-list.component.scss'],
+    imports: [
+        CommonModule,
+        MatButtonModule,
+        MatDialogModule,
+        MatIconModule,
+        MatPaginatorModule,
+        MatSelectModule,
+        MatTableModule,
+        MatSnackBarModule,
+        MatToolbarModule,
+        AttestedFilterWarningComponent
+    ]
 })
 export class EndpointListComponent implements OnInit {
   endpoints: Array<Endpoint> = [];

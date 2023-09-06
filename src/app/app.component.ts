@@ -76,6 +76,9 @@ export class AppComponent implements OnInit, AfterViewInit {
 
 
   selectUserProfile(userProfile: UserProfile) {
+    if (this.currentUserProfile === userProfile) {
+      return;
+    }
     this.profileService.setProfile(userProfile);
   }
 

@@ -20,22 +20,24 @@ import { firstValueFrom } from 'rxjs';
 import { ApiLogComponent } from '../../core/api-log/api-log.component';
 import { UserProfileService } from 'src/app/services/core/user-profile.service';
 import { IUserProfile } from 'src/app/interfaces/user-profile.interface';
+import { AttestedFilterWarningComponent } from "../../core/attested-filter-warning/attested-filter-warning.component";
 
 @Component({
-  selector: 'app-organization-list',
-  standalone: true,
-  imports: [
-    CommonModule,
-    MatButtonModule,
-    MatDialogModule,
-    MatIconModule,
-    MatPaginatorModule,
-    MatTableModule,
-    MatSnackBarModule,
-    MatToolbarModule
-  ],
-  templateUrl: './organization-list.component.html',
-  styleUrls: ['./organization-list.component.scss']
+    selector: 'app-organization-list',
+    standalone: true,
+    templateUrl: './organization-list.component.html',
+    styleUrls: ['./organization-list.component.scss'],
+    imports: [
+        CommonModule,
+        MatButtonModule,
+        MatDialogModule,
+        MatIconModule,
+        MatPaginatorModule,
+        MatTableModule,
+        MatSnackBarModule,
+        MatToolbarModule,
+        AttestedFilterWarningComponent
+    ]
 })
 export class OrganizationListComponent implements OnInit {
   pageSize: number = 20;

@@ -65,6 +65,7 @@
       <span *ngIf="selectedOrganizationId">No endpoints associated with &quot;<strong>Organization/{{ this.selectedOrganizationId }}</strong>&quot;</span>
       <span *ngIf="!selectedOrganizationId && organizations && organizations.length > 0">No organization selected.</span>
       <span *ngIf="!selectedOrganizationId && (!organizations || organizations.length < 1)">No organizations associated with user {{ currentUser?.email }}</span>
+      <app-attested-filter-warning></app-attested-filter-warning>
     </div>
   </ng-template>
 

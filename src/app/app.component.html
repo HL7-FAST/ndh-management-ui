@@ -23,17 +23,24 @@
   <span class="toolbar-divider">
     <theme-picker></theme-picker>
   </span>
-  <span class="user-profile toolbar-divider">    
+  <span class="user-profile toolbar-divider" matTooltip="{{ currentUserProfile?.email }}">    
     <button mat-icon-button [matMenuTriggerFor]="userProfileMenu" aria-label="Access user profile options">
       <mat-icon class="profile-icon">account_circle</mat-icon>
     </button>
     <mat-menu #userProfileMenu="matMenu">
-      <ng-container *ngFor="let userProfile of availableUserProfiles">
+      <!-- <ng-container *ngFor="let userProfile of availableUserProfiles">
         <button mat-menu-item (click)="selectUserProfile(userProfile)" [disabled]="currentUserProfile?.email === userProfile.email">
           <mat-icon>account_circle</mat-icon>
-          <span>{{ userProfile?.firstName }} {{ userProfile?.lastName}}</span>
+          <span>{{ userProfile?.firstName }} {{ userProfile?.lastName}} {{ userProfile?.email }}</span>
         </button>
-      </ng-container>
+      </ng-container> -->
+      <mat-nav-list>
+        <mat-list-item *ngFor="let userProfile of availableUserProfiles" (click)="selectUserProfile(userProfile)" [activated]="currentUserProfile?.email === userProfile.email" [disabled]="currentUserProfile?.email === userProfile.email">
+          <mat-icon matListItemIcon>person</mat-icon>
+          <div matListItemTitle>{{ userProfile?.firstName }} {{ userProfile?.lastName}}</div>
+          <div matListItemLine>{{ userProfile?.email }}</div>
+        </mat-list-item>
+      </mat-nav-list>
     </mat-menu>
     <span class="profile-name">
       {{ currentUserProfile?.firstName }} {{ currentUserProfile?.lastName}}

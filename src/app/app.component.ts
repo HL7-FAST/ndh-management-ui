@@ -17,7 +17,8 @@ import { ApiLogComponent } from './components/core/api-log/api-log.component';
 })
 export class AppComponent implements OnInit, AfterViewInit {
   title = 'fhir-client';
-  userProfile: UserProfile | undefined;
+  availableUserProfiles: Array<UserProfile> = [];
+  currentUserProfile: UserProfile | undefined;
   showMenuText: boolean = true;
   apiLogCount: number = 0;
   @ViewChild('apiLogComponent') apiLogComponent!: ApiLogComponent;
@@ -30,17 +31,24 @@ export class AppComponent implements OnInit, AfterViewInit {
 
   constructor(private breakpointObserver: BreakpointObserver, private authService: AuthenticationService, private profileService: UserProfileService, private dialog: MatDialog, private router: Router, private cdr: ChangeDetectorRef) {
 
-    this.profileService.userProfileUpdated.subscribe(profile => {
-      this.userProfile = profile;
-    });
+    
 
   }
 
   ngOnInit(): void {
-    this.userProfile = this.profileService.getProfile();
+
+    this.availableUserProfiles = this.profileService.userList;
+
+    this.profileService.userProfileUpdated.subscribe(profile => {
+      this.currentUserProfile = profile;
+    });
+
   }
 
   ngAfterViewInit(): void {
+    this.profileService.userProfileUpdated.subscribe(profile => {
+      this.currentUserProfile = profile;
+    });
     this.apiLogComponent.logCount.subscribe(count => { 
       this.apiLogCount = count; 
       this.cdr.detectChanges();
@@ -64,6 +72,11 @@ export class AppComponent implements OnInit, AfterViewInit {
         window.location.reload();
       }
     });
+  }
+
+
+  selectUserProfile(userProfile: UserProfile) {
+    this.profileService.setProfile(userProfile);
   }
 
 }

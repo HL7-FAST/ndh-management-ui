@@ -32,7 +32,7 @@
     </mat-card>
   </div>
 
-  <div>
+  <div *ngIf="endpoint.connectionType">
     <p><strong>Connection Type:</strong></p>
     <mat-card class="resource-card">
       <mat-card-content>

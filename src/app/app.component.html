@@ -24,18 +24,19 @@
     <theme-picker></theme-picker>
   </span>
   <span class="user-profile toolbar-divider">    
-    <mat-icon>account_circle</mat-icon>
-    <!-- <button mat-icon-button [matMenuTriggerFor]="userProfileMenu" aria-label="Access user profile options">
+    <button mat-icon-button [matMenuTriggerFor]="userProfileMenu" aria-label="Access user profile options">
       <mat-icon class="profile-icon">account_circle</mat-icon>
     </button>
     <mat-menu #userProfileMenu="matMenu">
-      <button mat-menu-item (click)="logout()">
-        <mat-icon>logout</mat-icon>
-        <span>Logout</span>
-      </button>
-    </mat-menu> -->
+      <ng-container *ngFor="let userProfile of availableUserProfiles">
+        <button mat-menu-item (click)="selectUserProfile(userProfile)" [disabled]="currentUserProfile?.email === userProfile.email">
+          <mat-icon>account_circle</mat-icon>
+          <span>{{ userProfile?.firstName }} {{ userProfile?.lastName}}</span>
+        </button>
+      </ng-container>
+    </mat-menu>
     <span class="profile-name">
-      {{ userProfile?.firstName }} {{ userProfile?.lastName}}
+      {{ currentUserProfile?.firstName }} {{ currentUserProfile?.lastName}}
     </span>    
   </span>
   

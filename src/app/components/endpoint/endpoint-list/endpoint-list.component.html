@@ -62,8 +62,10 @@
   </div>
   <ng-template #no_endpoints_found>
     <div class="no-results-found-container">
-      <span>No endpoints associated with &quot;<strong>Organization/{{ this.selectedOrganizationId }}</strong>&quot;</span>
-    </div>    
+      <span *ngIf="selectedOrganizationId">No endpoints associated with &quot;<strong>Organization/{{ this.selectedOrganizationId }}</strong>&quot;</span>
+      <span *ngIf="!selectedOrganizationId && organizations && organizations.length > 0">No organization selected.</span>
+      <span *ngIf="!selectedOrganizationId && (!organizations || organizations.length < 1)">No organizations associated with user {{ currentUser?.email }}</span>
+    </div>
   </ng-template>
 
 </div>

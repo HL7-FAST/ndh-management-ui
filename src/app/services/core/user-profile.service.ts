@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { OAuthService } from 'angular-oauth2-oidc';
-import { Subject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 import { IUserProfile } from 'src/app/interfaces/user-profile.interface';
 import { UserProfile } from 'src/app/models/user-pofile.model';
 import { SessionStorageService } from './session.service';
@@ -11,15 +11,22 @@ import { SessionStorageService } from './session.service';
 export class UserProfileService {
 
   private profileKey: string = "user-profile";
-  private _userProfileUpdatedSubject = new Subject<UserProfile>();
-  userProfileUpdated = this._userProfileUpdatedSubject.asObservable();
+  public userProfileUpdated: BehaviorSubject<UserProfile>;
+
+  public userList: Array<UserProfile> = [
+    new UserProfile('HandleAttestation', 'handle@attestation.com', 'Test', 'User1', [''], [''], ['']),
+    new UserProfile('HandleAttestation2', 'handle2@attestation.com', 'Test', 'User2', [''], [''], [''])
+  ];
 
   //private oauthService: OAuthService
-  constructor(private sessionStorageSrv: SessionStorageService) { }
+  constructor(private sessionStorageSrv: SessionStorageService) { 
+    this.userProfileUpdated = new BehaviorSubject<UserProfile>(this.getProfile());
+  }
 
   setProfile(profile: IUserProfile) {
+    console.log('setProfile:', profile);
     this.sessionStorageSrv.storeItem(this.profileKey, JSON.stringify(profile));
-    this._userProfileUpdatedSubject.next(profile);
+    this.userProfileUpdated.next(profile);
   }
 
   getProfile(): IUserProfile {
@@ -29,7 +36,7 @@ export class UserProfileService {
       return JSON.parse(profile) as IUserProfile;
     }
     else {
-      return new UserProfile('', 'Anonymous', 'User', [''], [''], ['']); 
+      return this.userList[0]; 
     } 
 
   }

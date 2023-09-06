@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
@@ -18,6 +18,8 @@ import { PractitionerRoleService } from 'src/app/services/practitioner-role.serv
 import { AttestationUtils } from 'src/app/utils/attestation-utils';
 import { firstValueFrom } from 'rxjs';
 import { ApiLogComponent } from '../../core/api-log/api-log.component';
+import { UserProfileService } from 'src/app/services/core/user-profile.service';
+import { IUserProfile } from 'src/app/interfaces/user-profile.interface';
 
 @Component({
   selector: 'app-organization-list',
@@ -35,14 +37,14 @@ import { ApiLogComponent } from '../../core/api-log/api-log.component';
   templateUrl: './organization-list.component.html',
   styleUrls: ['./organization-list.component.scss']
 })
-export class OrganizationListComponent {
+export class OrganizationListComponent implements OnInit {
   pageSize: number = 20;
   pageNumber: number = 0;
   totalCount: number = 0;
-  defaultLink: string = `?_count=${this.pageSize}&_total=accurate&practitioner.telecom=handle@attestation.com&_include=PractitionerRole:organization`;
-  currentPractioner: string;
   nextLink: string = '';
   prevLink: string = '';
+
+  currentUser?: IUserProfile = undefined;
   organizations: Array<Organization> = [];
   paginationMetadata: PaginationMetadata = new PaginationMetadata;
 
@@ -52,16 +54,34 @@ export class OrganizationListComponent {
 
 
   
-  constructor(private organizationService: OrganizationService, private practitionerRoleService: PractitionerRoleService, private dialog: MatDialog, private snackBar: MatSnackBar) {
+  constructor(private organizationService: OrganizationService, private practitionerRoleService: PractitionerRoleService, private userProfileService: UserProfileService, private dialog: MatDialog, private snackBar: MatSnackBar) {
     this.getOrganizations(this.defaultLink);
-    this.currentPractioner = 'HandleAttestation';
   }
+
+
+  ngOnInit(): void {
+    this.userProfileService.userProfileUpdated.subscribe(profile => {
+      this.currentUser = profile;
+      this.getOrganizations(this.defaultLink);
+    });
+  }
+
+
+  get defaultLink(): string {
+    return `?_count=${this.pageSize}&_total=accurate&_has:PractitionerRole:organization:practitioner.telecom=${this.currentUser?.email}`;
+  }
+  
 
   getOrganizations(queryString: string) {
     this.organizations = [];
-    this.organizationService.searchResource('PractitionerRole', queryString).subscribe((data: Bundle<PractitionerRole|Organization>) => {
+
+    if (!this.currentUser) {
+      return;
+    }
+
+    this.organizationService.searchResource('Organization', queryString).subscribe((data: Bundle<Organization>) => {
       this.organizations = (data.entry || [])
-        .filter(e => e.search?.mode === 'include' && e.resource?.resourceType === 'Organization')
+        .filter(e => e.resource?.resourceType === 'Organization')
         .map(e => e.resource as Organization);
 
       this.totalCount = data.total ? data.total : 0;
@@ -81,7 +101,6 @@ export class OrganizationListComponent {
     if(this.pageSize != event.pageSize) {
       this.pageNumber = 0;
       this.pageSize = event.pageSize;
-      this.defaultLink = `?_count=${this.pageSize}`;
       this.getOrganizations(this.defaultLink);
     }
     else if(this.pageNumber < event.pageSize) {
@@ -120,7 +139,7 @@ export class OrganizationListComponent {
 
           // create PractionerRole for this new Organization
           const newPractionerRole: PractitionerRole = {...basePractitionerRole} as PractitionerRole;
-          newPractionerRole.practitioner = { reference: `Practitioner/${this.currentPractioner}` };
+          newPractionerRole.practitioner = { reference: `Practitioner/${this.currentUser?.username}` };
           newPractionerRole.organization = { reference: `Organization/${res.id}` };
 
           this.practitionerRoleService.createResource('PractitionerRole', newPractionerRole).subscribe(pr => {

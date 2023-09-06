@@ -16,6 +16,8 @@ import { AttestationUtils } from 'src/app/utils/attestation-utils';
 import { DeleteItemDialogComponent } from '../../core/delete-item-dialog/delete-item-dialog.component';
 import { EndpointViewDialogComponent } from '../endpoint-view-dialog/endpoint-view-dialog.component';
 import { EndpointFormDialogComponent } from '../endpoint-form-dialog/endpoint-form-dialog.component';
+import { IUserProfile } from 'src/app/interfaces/user-profile.interface';
+import { UserProfileService } from 'src/app/services/core/user-profile.service';
 
 @Component({
   selector: 'app-endpoint-list',
@@ -41,7 +43,7 @@ export class EndpointListComponent implements OnInit {
   pageSize: number = 20;
   pageNumber: number = 0;
   totalCount: number = 0;
-  currentPractioner: string;
+  currentUser?: IUserProfile = undefined;
   nextLink: string = '';
   prevLink: string = '';
   paginationMetadata: PaginationMetadata = new PaginationMetadata;
@@ -61,18 +63,25 @@ export class EndpointListComponent implements OnInit {
 
 
 
-  constructor(private endpointService: EndpointService, private organizationService: OrganizationService, private dialog: MatDialog, private snackBar: MatSnackBar) {
-    this.currentPractioner = 'HandleAttestation';
-  }
+  constructor(private endpointService: EndpointService, private organizationService: OrganizationService, private userProfileService: UserProfileService, private dialog: MatDialog, private snackBar: MatSnackBar) { }
 
   async ngOnInit(): Promise<void> {
-    
-    this.organizations = await this.organizationService.getAll(`?_has:PractitionerRole:organization:practitioner=${this.currentPractioner}&_sort=name&_summary=true`);
 
-    if (this.organizations && this.organizations.length > 0) {
-      this.selectedOrganizationId = this.organizations[0].id as string;
-      this.getEndpoints();
-    }
+    this.userProfileService.userProfileUpdated.subscribe(async profile => {
+      this.currentUser = profile;
+      this.endpoints = [];
+      this.organizations = [];
+      this.selectedOrganizationId = '';
+
+      this.organizations = await this.organizationService.getAll(`?_has:PractitionerRole:organization:practitioner.telecom=${this.currentUser.email}&_sort=name&_summary=true`);
+
+      if (this.organizations && this.organizations.length > 0) {
+        this.selectedOrganizationId = this.organizations[0].id as string;
+        this.getEndpoints();
+      }
+    });
+    
+    
 
   }
 

@@ -1,0 +1,16 @@
+@use '../../../../styles/core.scss';
+
+.api-log-panel {
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+.collapsed-panel-header {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.request-body-textarea {
+  width: 100%;
+}

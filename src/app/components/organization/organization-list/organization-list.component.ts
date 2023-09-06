@@ -17,6 +17,7 @@ import basePractitionerRole from '../../../../assets/fhir/PractitionerRole-ndh.j
 import { PractitionerRoleService } from 'src/app/services/practitioner-role.service';
 import { AttestationUtils } from 'src/app/utils/attestation-utils';
 import { firstValueFrom } from 'rxjs';
+import { ApiLogComponent } from '../../core/api-log/api-log.component';
 
 @Component({
   selector: 'app-organization-list',

@@ -6,8 +6,6 @@ import {
   HttpInterceptor
 } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from 'src/environments/environment';
-import { SessionStorageService } from '../services/core/session.service';
 import { ConfigService } from '../services/config.service';
 
 @Injectable()

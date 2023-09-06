@@ -10,6 +10,12 @@
   <span class="toolbar-divider">National Directory of Healthcare Providers &amp; Services</span>
   <span class="example-spacer"></span>
   <span class="toolbar-divider">
+    <button mat-icon-button matTooltip="Show API log" (click)="apiLogDrawer.toggle()">
+      <!-- <mat-icon [matBadge]="apiLogComponent.apiLogs.length" matBadgeColor="accent">list</mat-icon> -->
+      <mat-icon [matBadge]="apiLogCount" matBadgeColor="accent">list</mat-icon>
+    </button>
+  </span>
+  <span class="toolbar-divider">
     <button mat-icon-button matTooltip="Change local client settings" (click)="showSettingsDialog($event)">
       <mat-icon>settings</mat-icon>
     </button>
@@ -18,7 +24,8 @@
     <theme-picker></theme-picker>
   </span>
   <span class="user-profile toolbar-divider">    
-    <button mat-icon-button [matMenuTriggerFor]="userProfileMenu" aria-label="Access user profile options">
+    <mat-icon>account_circle</mat-icon>
+    <!-- <button mat-icon-button [matMenuTriggerFor]="userProfileMenu" aria-label="Access user profile options">
       <mat-icon class="profile-icon">account_circle</mat-icon>
     </button>
     <mat-menu #userProfileMenu="matMenu">
@@ -26,7 +33,7 @@
         <mat-icon>logout</mat-icon>
         <span>Logout</span>
       </button>
-    </mat-menu>
+    </mat-menu> -->
     <span class="profile-name">
       {{ userProfile?.firstName }} {{ userProfile?.lastName}}
     </span>    
@@ -95,4 +102,7 @@
     <!-- Add Content Here  format_color_fill -->
     <router-outlet></router-outlet>
   </mat-drawer-content>
+  <mat-drawer mode="over" position="end" #apiLogDrawer>
+    <app-api-log #apiLogComponent></app-api-log>
+  </mat-drawer>
 </mat-drawer-container>

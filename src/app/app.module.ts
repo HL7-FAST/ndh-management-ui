@@ -27,6 +27,8 @@ import { environment } from '../environments/environment';
 import { SettingsDialogComponent } from "./components/core/settings-dialog/settings-dialog.component";
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { ApiLogComponent } from "./components/core/api-log/api-log.component";
+import { MatBadgeModule } from '@angular/material/badge';
 
 
 
@@ -65,7 +67,9 @@ import { MatTooltipModule } from '@angular/material/tooltip';
         MatNativeDateModule,
         LoadingIndicatorComponent,
         AuthBypassComponent,
-        SettingsDialogComponent
+        SettingsDialogComponent,
+        MatBadgeModule,
+        ApiLogComponent
     ]
 })
 export class AppModule { }

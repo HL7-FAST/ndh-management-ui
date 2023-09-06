@@ -1,0 +1,74 @@
+<!-- <mat-card> -->
+  <mat-toolbar>FHIR Server Request Log ({{ apiLogs ? apiLogs.length : 0 }})</mat-toolbar>
+
+  <div style="display: flex; align-items: center;">
+    <mat-form-field>
+      <mat-label>Sort By</mat-label>
+      <mat-select [(value)]="selectedSortBy" (valueChange)="sortLogs()">
+        <mat-option value="date">Time</mat-option>
+        <mat-option value="url">URL</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Sort Order</mat-label>
+      <mat-select [(value)]="selectedSortOrder" (valueChange)="sortLogs()">
+        <mat-option value="asc">Ascending</mat-option>
+        <mat-option value="desc">Descending</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <span style="flex: 1 1 auto;"></span>
+
+    <button mat-raised-button extended style="margin: 0.25em" matTooltip="Clear logs" color="primary" (click)="clearLogs()">
+      <mat-icon>clear_all</mat-icon>
+      Clear Logs
+    </button>
+  </div>
+  
+    
+  <!-- <mat-card-content> -->
+    <mat-accordion class="api-log-panel" [multi]="true">
+      <mat-expansion-panel *ngFor="let apiLog of apiLogs" #panel>
+        <mat-expansion-panel-header>
+          <div *ngIf="!panel.expanded" class="collapsed-panel-header">
+            ({{ apiLog.date.toLocaleTimeString() }}) {{ apiLog.method }} {{ apiLog.url }}
+          </div>
+          <div *ngIf="panel.expanded"><h4>Request Details</h4></div>
+        </mat-expansion-panel-header>
+        <div *ngIf="apiLog; else noApiLog">
+          <mat-nav-list>
+            <h4>Request URL</h4>
+            <a mat-list-item href="{{ apiLog.url }}" target="_blank">
+              {{ apiLog.method }}
+              {{ apiLog.url }}
+              <button mat-icon-button matListItemMeta>
+                <mat-icon>open_in_new</mat-icon>
+              </button>
+            </a>
+          </mat-nav-list>
+          <mat-list>
+            <ng-container *ngIf="(apiLog.headers | keyvalue).length > 0">
+              <h4>Headers</h4>
+              <mat-list-item *ngFor="let header of apiLog.headers | keyvalue">
+                <p matListItemLine>{{header.key}}: {{header.value}}</p>
+              </mat-list-item>
+            </ng-container>
+          </mat-list>
+          <ng-container *ngIf="apiLog.body">
+            <h4>Request Body</h4>
+            <mat-form-field class="request-body-textarea">
+              <textarea matInput cdkTextareaAutosize>{{ apiLog.body | json }}</textarea>
+            </mat-form-field>
+          </ng-container>
+        </div>
+        <ng-template #noApiLog>
+          <div class="no-results-found-container">
+            <span>No FHIR server request logged yet.</span>
+          </div>    
+        </ng-template>
+    
+      </mat-expansion-panel>
+    </mat-accordion>
+  <!-- </mat-card-content>
+</mat-card> -->

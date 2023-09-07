@@ -10,23 +10,25 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { environment } from 'src/environments/environment';
+import { ThemePickerComponent } from "../theme-picker/theme-picker.component";
 
 @Component({
-  selector: 'app-settings-dialog',
-  standalone: true,
-  imports: [
-    CommonModule,
-    MatButtonModule,
-    MatDialogModule,
-    MatFormFieldModule,
-    MatIconModule,
-    MatInputModule,
-    MatSlideToggleModule,
-    MatTooltipModule,
-    ReactiveFormsModule
-  ],
-  templateUrl: './settings-dialog.component.html',
-  styleUrls: ['./settings-dialog.component.scss']
+    selector: 'app-settings-dialog',
+    standalone: true,
+    templateUrl: './settings-dialog.component.html',
+    styleUrls: ['./settings-dialog.component.scss'],
+    imports: [
+        CommonModule,
+        MatButtonModule,
+        MatDialogModule,
+        MatFormFieldModule,
+        MatIconModule,
+        MatInputModule,
+        MatSlideToggleModule,
+        MatTooltipModule,
+        ReactiveFormsModule,
+        ThemePickerComponent
+    ]
 })
 export class SettingsDialogComponent implements OnInit {
 

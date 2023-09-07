@@ -11,7 +11,6 @@
   <span class="example-spacer"></span>
   <span class="toolbar-divider">
     <button mat-icon-button matTooltip="Show API log" (click)="apiLogDrawer.toggle()">
-      <!-- <mat-icon [matBadge]="apiLogComponent.apiLogs.length" matBadgeColor="accent">list</mat-icon> -->
       <mat-icon [matBadge]="apiLogCount" matBadgeColor="accent">list</mat-icon>
     </button>
   </span>
@@ -20,20 +19,11 @@
       <mat-icon>settings</mat-icon>
     </button>
   </span>
-  <span class="toolbar-divider">
-    <theme-picker></theme-picker>
-  </span>
   <span class="user-profile toolbar-divider" matTooltip="{{ currentUserProfile?.email }}">    
     <button mat-icon-button [matMenuTriggerFor]="userProfileMenu" aria-label="Access user profile options">
       <mat-icon class="profile-icon">account_circle</mat-icon>
     </button>
     <mat-menu #userProfileMenu="matMenu">
-      <!-- <ng-container *ngFor="let userProfile of availableUserProfiles">
-        <button mat-menu-item (click)="selectUserProfile(userProfile)" [disabled]="currentUserProfile?.email === userProfile.email">
-          <mat-icon>account_circle</mat-icon>
-          <span>{{ userProfile?.firstName }} {{ userProfile?.lastName}} {{ userProfile?.email }}</span>
-        </button>
-      </ng-container> -->
       <mat-nav-list>
         <mat-list-item *ngFor="let userProfile of availableUserProfiles" (click)="selectUserProfile(userProfile)" [activated]="currentUserProfile?.email === userProfile.email" [disabled]="currentUserProfile?.email === userProfile.email">
           <mat-icon matListItemIcon>person</mat-icon>
@@ -92,25 +82,17 @@
         <mat-icon matListItemIcon [ngClass]="{'close-menu-icon' : !showMenuText}">medical_services</mat-icon>
         <div class="side-nav-menu-title" matListItemTitle *ngIf="showMenuText">Organization</div>
       </a>
-      <!-- <a mat-list-item routerLink="patient-list" routerLinkActive="active">
-        <mat-icon matListItemIcon [ngClass]="{'close-menu-icon' : !showMenuText}">personal_injury</mat-icon>
-        <div class="side-nav-menu-title" matListItemTitle *ngIf="showMenuText">Patient</div>
-      </a> -->
       <a mat-list-item routerLink="capability-statement" routerLinkActive="active">
         <mat-icon matListItemIcon [ngClass]="{'close-menu-icon' : !showMenuText}">description</mat-icon>
         <div class="side-nav-menu-title" matListItemTitle *ngIf="showMenuText">Capability Statement</div>
-      </a>      
-      <!-- <a mat-list-item routerLink="themes" routerLinkActive="active">
-        <mat-icon matListItemIcon [ngClass]="{'close-menu-icon' : !showMenuText}">palette</mat-icon>
-        <div class="side-nav-menu-title" matListItemTitle *ngIf="showMenuText">Themes</div>
-      </a> -->
+      </a>
     </mat-nav-list>
   </mat-drawer>
   <mat-drawer-content class="main-content">
     <!-- Add Content Here  format_color_fill -->
     <router-outlet></router-outlet>
   </mat-drawer-content>
-  <mat-drawer mode="over" position="end" #apiLogDrawer>
+  <mat-drawer mode="over" position="end" #apiLogDrawer class="api-log-drawer">
     <app-api-log #apiLogComponent></app-api-log>
   </mat-drawer>
 </mat-drawer-container>

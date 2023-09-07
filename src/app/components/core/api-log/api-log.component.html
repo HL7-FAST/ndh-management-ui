@@ -1,33 +1,37 @@
-<!-- <mat-card> -->
-  <mat-toolbar>FHIR Server Request Log ({{ apiLogs ? apiLogs.length : 0 }})</mat-toolbar>
+<mat-card>
+  <mat-toolbar>
+    <mat-toolbar-row>
+      FHIR Server Request Log ({{ apiLogs ? apiLogs.length : 0 }})
+    </mat-toolbar-row>
 
-  <div style="display: flex; align-items: center;">
-    <mat-form-field>
-      <mat-label>Sort By</mat-label>
-      <mat-select [(value)]="selectedSortBy" (valueChange)="sortLogs()">
-        <mat-option value="date">Time</mat-option>
-        <mat-option value="url">URL</mat-option>
-      </mat-select>
-    </mat-form-field>
+    <mat-toolbar-row>
+      <mat-form-field>
+        <mat-label>Sort By</mat-label>
+        <mat-select [(value)]="selectedSortBy" (valueChange)="sortLogs()">
+          <mat-option value="date">Time</mat-option>
+          <mat-option value="url">URL</mat-option>
+        </mat-select>
+      </mat-form-field>
 
-    <mat-form-field>
-      <mat-label>Sort Order</mat-label>
-      <mat-select [(value)]="selectedSortOrder" (valueChange)="sortLogs()">
-        <mat-option value="asc">Ascending</mat-option>
-        <mat-option value="desc">Descending</mat-option>
-      </mat-select>
-    </mat-form-field>
+      <mat-form-field>
+        <mat-label>Sort Order</mat-label>
+        <mat-select [(value)]="selectedSortOrder" (valueChange)="sortLogs()">
+          <mat-option value="asc">Ascending</mat-option>
+          <mat-option value="desc">Descending</mat-option>
+        </mat-select>
+      </mat-form-field>
 
-    <span style="flex: 1 1 auto;"></span>
+      <span style="flex: 1 1 auto;"></span>
 
-    <button mat-raised-button extended style="margin: 0.25em" matTooltip="Clear logs" color="primary" (click)="clearLogs()">
-      <mat-icon>clear_all</mat-icon>
-      Clear Logs
-    </button>
-  </div>
+      <button mat-raised-button extended style="margin: 0.25em" matTooltip="Clear logs" color="primary" (click)="clearLogs()">
+        <mat-icon>clear_all</mat-icon>
+        Clear Logs
+      </button>
+    </mat-toolbar-row>
+  </mat-toolbar>
   
     
-  <!-- <mat-card-content> -->
+  <mat-card-content>
     <mat-accordion class="api-log-panel" [multi]="true">
       <mat-expansion-panel *ngFor="let apiLog of apiLogs" #panel>
         <mat-expansion-panel-header>
@@ -70,5 +74,5 @@
     
       </mat-expansion-panel>
     </mat-accordion>
-  <!-- </mat-card-content>
-</mat-card> -->
+  </mat-card-content>
+</mat-card>

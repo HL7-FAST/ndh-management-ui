@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, Inject, OnInit } from '@angular/core';
-import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormArray, FormControl, FormGroup, FormsModule, NgModel, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -24,6 +24,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
   standalone: true,
   imports: [
     CommonModule,
+    FormsModule,
     MatButtonModule,
     MatCheckboxModule,
     MatChipsModule,
@@ -50,6 +51,7 @@ export class OrganizationFormDialogComponent implements OnInit {
   identifierTypes = FhirFormUtils.getIdentifierTypes();
   compareIdentifierTypes = FhirFormUtils.compareIdentifierTypes;
   isAttested = AttestationUtils.getIsAttested;
+  resetAttestedChecked = false;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: { dialogTitle: string, organization: Organization },
@@ -75,6 +77,8 @@ export class OrganizationFormDialogComponent implements OnInit {
       telecom: FhirFormUtils.getContactPointFormArray(this.organization.telecom, false),
       identifier: FhirFormUtils.getIdentifierFormArray(this.organization.identifier, false)
     });
+
+    this.resetAttestedChecked = this.isAttested(this.organization);
 
   }
 
@@ -160,6 +164,28 @@ export class OrganizationFormDialogComponent implements OnInit {
   }
 
 
+  markUnattested() {
+    
+    const valueMeta: Meta = { security: [AttestationUtils.getNotAttestedSecurityCoding()] };
+
+    this.organizationService.metaAdd('Organization', this.organization.id as string, valueMeta).subscribe(data => {
+      console.log(data);
+      if(data) {
+        this.dialogRef.close(data);
+      }        
+      else {
+        this.snackBar.open(`Failed to update Organization, see console for details.`, '', {
+          duration: 3500,
+          panelClass: 'error-snackbar',
+          horizontalPosition: 'end',
+          verticalPosition: 'top'
+        });
+      }
+    });
+
+  }
+
+
 
   onSubmit() {
 
@@ -196,7 +222,12 @@ export class OrganizationFormDialogComponent implements OnInit {
       this.organizationService.updateResource('Organization', this.organization.id as string, this.organization).subscribe(data => {
         console.log(data);
         if(data) {
-          this.dialogRef.close(data);
+          if (this.resetAttestedChecked) {
+            this.markUnattested();
+          }
+          else {
+            this.dialogRef.close(data);
+          }
         }        
         else {
           this.snackBar.open(`Failed to update Organization, see console for details.`, '', {

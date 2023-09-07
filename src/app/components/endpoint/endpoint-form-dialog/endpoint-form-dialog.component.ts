@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, Inject, OnInit } from '@angular/core';
-import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormArray, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatChipsModule } from '@angular/material/chips';
@@ -26,6 +26,7 @@ import { FhirFormUtils } from 'src/app/utils/fhir-form-utils';
   standalone: true,
   imports: [
     CommonModule,
+    FormsModule,
     MatButtonModule,
     MatCheckboxModule,
     MatChipsModule,
@@ -51,7 +52,8 @@ export class EndpointFormDialogComponent implements OnInit {
   compareContactPoints = FhirFormUtils.compareContactPoints;
   contactSystems = FhirFormUtils.getContactPointSystems();
   contactUseCases = FhirFormUtils.getContactPointUseCases();  
-  isAttested = AttestationUtils.getIsAttested;  
+  isAttested = AttestationUtils.getIsAttested;
+  resetAttestedChecked = false;
 
 
   constructor(
@@ -79,6 +81,8 @@ export class EndpointFormDialogComponent implements OnInit {
       connectionType: FhirFormUtils.getCodingFormGroup(this.endpoint.connectionType, false),
       payloadType: FhirFormUtils.getCodeableConceptFormArray(this.endpoint.payloadType, false)
     });
+
+    this.resetAttestedChecked = this.isAttested(this.endpoint);
 
   }
 
@@ -163,6 +167,26 @@ export class EndpointFormDialogComponent implements OnInit {
 
   }
 
+  markUnattested() {
+    
+    const valueMeta: Meta = { security: [AttestationUtils.getNotAttestedSecurityCoding()] };
+
+    this.endpointService.metaAdd('Endpoint', this.endpoint.id as string, valueMeta).subscribe(data => {
+      if(data) {
+        this.dialogRef.close(data);
+      }        
+      else {
+        this.snackBar.open(`Failed to update Endpoint, see console for details.`, '', {
+          duration: 3500,
+          panelClass: 'error-snackbar',
+          horizontalPosition: 'end',
+          verticalPosition: 'top'
+        });
+      }
+    });
+
+  }
+
   onSubmit() {
 
     if (!this.endpointForm.valid) {
@@ -201,7 +225,12 @@ export class EndpointFormDialogComponent implements OnInit {
       this.endpointService.update(this.endpoint.id as string, this.endpoint).subscribe(data => {
         console.log(data);
         if(data) {
-          this.dialogRef.close(data);
+          if (this.resetAttestedChecked) {
+            this.markUnattested();
+          }
+          else {
+            this.dialogRef.close(data);
+          }
         }        
         else {
           this.snackBar.open(`Failed to update Endpoint, see console for details.`, '', {

@@ -157,7 +157,7 @@ export class ResourceService {
 
   metaAdd(resourceType: string, resourceId: string, valueMeta: Meta): Observable<any> {
 
-    let url = `${this.baseApiUrl}/${resourceType}/${resourceId}/$meta-delete`;
+    let url = `${this.baseApiUrl}/${resourceType}/${resourceId}/$meta-add`;
 
     const parameters: Parameters = {
       resourceType: 'Parameters',

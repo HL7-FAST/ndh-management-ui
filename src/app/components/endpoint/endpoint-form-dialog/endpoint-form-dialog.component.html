@@ -146,6 +146,9 @@
   </form>
 </div>
 <div mat-dialog-actions align="end">
+
+  <mat-checkbox *ngIf="isAttested(endpoint)" [(ngModel)]="resetAttestedChecked" style="margin-right: 0.5em;">Mark as unattested</mat-checkbox>
+
   <button mat-raised-button color="primary" [disabled]="endpointForm.invalid" (click)="onSubmit()">
     <mat-icon>{{ formMode == FormMode.Create ? 'save' : 'save_as'}}</mat-icon>
     {{ formMode == FormMode.Create ? 'Create' : 'Update'}} Endpoint

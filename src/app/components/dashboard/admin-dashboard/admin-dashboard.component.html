@@ -1,1 +1,39 @@
-<p>admin-dashboard works!</p>
+<div class="content">
+  <mat-toolbar class="page-header-bar" color="primary">
+    <span>NDH Management Dashboard</span>
+  </mat-toolbar>
+
+  <mat-grid-list cols="4">
+
+    <mat-grid-tile>
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>FHIR Server Status</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          
+          <ng-container *ngIf="currentFhirServer && currentFhirServer.length > 0; else noCurrentFhirServer">
+            <mat-nav-list>    
+              <mat-list-item>
+                <mat-icon *ngIf="!serverIsOnline" matListItemIcon color="warn" matTooltip="Cannot retrieve capability statement">error</mat-icon>
+                <mat-icon *ngIf="serverIsOnline" matListItemIcon color="primary" matTooltip="Server is online">check_circle_outline</mat-icon>
+                <a matListItemTitle href="{{ currentFhirServer }}" target="_blank">
+                  {{ currentFhirServer }}
+                  <button mat-icon-button>
+                    <mat-icon>open_in_new</mat-icon>
+                  </button>
+                </a>
+              </mat-list-item>
+            </mat-nav-list>
+          </ng-container>
+          <ng-template #noCurrentFhirServer>
+            No FHIR server currently configured.
+          </ng-template>
+    
+        </mat-card-content>
+      </mat-card>
+    </mat-grid-tile>
+
+  </mat-grid-list>
+  
+</div>

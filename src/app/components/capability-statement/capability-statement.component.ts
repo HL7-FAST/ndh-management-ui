@@ -1,19 +1,27 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatFormFieldModule } from '@angular/material/form-field';
+import {Component, OnInit} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
+import {MatSnackBar, MatSnackBarModule} from '@angular/material/snack-bar';
+import {MatFormFieldModule} from '@angular/material/form-field';
 import {Clipboard} from '@angular/cdk/clipboard';
-import { ResourceService } from 'src/app/services/core/resource.service';
-import { CapabilityStatement, CapabilityStatementRestResource, CapabilityStatementRestResourceOperation } from 'fhir/r4';
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatCardModule } from '@angular/material/card';
-import { MatTabsModule } from '@angular/material/tabs';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
-import { MatExpansionModule } from '@angular/material/expansion';
-import { environment } from 'src/environments/environment';
+import {ResourceService} from 'src/app/services/core/resource.service';
+import {
+  CapabilityStatement,
+  CapabilityStatementRest,
+  CapabilityStatementRestResource,
+  CapabilityStatementRestResourceOperation
+} from 'fhir/r4';
+import {MatToolbarModule} from '@angular/material/toolbar';
+import {MatCardModule} from '@angular/material/card';
+import {MatTabsModule} from '@angular/material/tabs';
+import {MatButtonModule} from '@angular/material/button';
+import {MatIconModule} from '@angular/material/icon';
+import {MatInputModule} from '@angular/material/input';
+import {MatExpansionModule} from '@angular/material/expansion';
+import {environment} from 'src/environments/environment';
+import {MatChipsModule} from "@angular/material/chips";
+import {MatTableModule} from "@angular/material/table";
+import {ResourceModule} from "./resource/resource.component";
 
 @Component({
   selector: 'app-capability-statement',
@@ -30,7 +38,10 @@ import { environment } from 'src/environments/environment';
     MatTabsModule,
     MatButtonModule,
     MatIconModule,
-    MatExpansionModule
+    MatExpansionModule,
+    MatChipsModule,
+    MatTableModule,
+    ResourceModule
   ],
   templateUrl: './capability-statement.component.html',
   styleUrls: ['./capability-statement.component.scss']
@@ -43,12 +54,22 @@ export class CapabilityStatementComponent implements OnInit {
   patientEverythingOperationCapability: boolean = false;
   patientFastIdentityMatchingOperationCapability: boolean = false;
 
+  searchParamTableColumns = ['name', 'type', 'documentation'];
+
   constructor(private resourceService: ResourceService, private snackBar: MatSnackBar, private clipboard: Clipboard) {}
   
   ngOnInit(): void {
     this.fhirServerForm = new FormGroup({
       fhirSever: new FormControl(environment.baseApiUrl, Validators.required)
     });
+    this.getCapabilityStatement();
+  }
+
+  get rest(): CapabilityStatementRest|undefined {
+    if (!this.capabilityStatement || !this.capabilityStatement.rest || !this.capabilityStatement.rest.length) {
+      return;
+    }
+    return this.capabilityStatement.rest[0];
   }
 
   get fhirServerControl() : FormControl {
@@ -142,7 +163,7 @@ export class CapabilityStatementComponent implements OnInit {
 
   serverHasOperation(operations: CapabilityStatementRestResourceOperation[], operationName: string) : boolean {
     let operationIndex = operations.findIndex(x => x.name === operationName);
-    return operationIndex == -1 ? false : true;
+    return operationIndex != -1;
   }
 
 }

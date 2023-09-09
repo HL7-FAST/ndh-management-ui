@@ -1,0 +1,50 @@
+
+<mat-card class="resource-card" [id]="resource.type">
+    <mat-card-content>
+        <mat-chip *ngIf="resource.profile">{{resource.profile}}</mat-chip>
+        <div *ngIf="resource.interaction?.length">
+            <p>Interactions</p>
+            <ul>
+                <li>Create-on-update: {{resource.updateCreate ? 'Yes': 'No'}}</li>
+                <li *ngFor="let i of resource.interaction">{{i.code}}: {{i.documentation || 'No documentation'}}</li>
+            </ul>
+        </div>
+        <div *ngIf="resource.operation?.length">
+            <p>Operations</p>
+            <ul>
+                <li *ngFor="let o of resource.operation">{{o.name}}: {{o.documentation || 'No documentation'}}</li>
+            </ul>
+        </div>
+        <p>Conditionals</p>
+        <ul>
+            <li>Read: {{resource.hasOwnProperty('conditionalRead') ? resource.conditionalRead : 'Not specified'}}</li>
+            <li>Create: {{resource.hasOwnProperty('conditionalCreate') ? (resource.conditionalCreate ? 'Yes' : 'No') : 'Not specified'}}</li>
+            <li>Update: {{resource.hasOwnProperty('conditionalUpdate') ? (resource.conditionalUpdate ? 'Yes' : 'No') : 'Not specified'}}</li>
+            <li>Delete: {{resource.hasOwnProperty('conditionalDelete') ? resource.conditionalDelete : 'Not specified'}}</li>
+        </ul>
+        <p>Search</p>
+        <ul>
+            <li>Supports _include: {{resource.searchInclude ? resource.searchInclude.join(', ') : 'No'}}</li>
+            <li>Supports _revInclude: {{resource.searchRevInclude ? resource.searchRevInclude.join(', ') : 'No'}}</li>
+        </ul>
+        <mat-table [dataSource]="searchParamDataSource">
+            <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef> Name </th>
+                <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="type">
+                <th mat-header-cell *matHeaderCellDef> Type </th>
+                <td mat-cell *matCellDef="let element"> {{element.type}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="documentation">
+                <th mat-header-cell *matHeaderCellDef> Documentation </th>
+                <td mat-cell *matCellDef="let element"> {{element.documentation}} </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="searchParamColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: searchParamColumns;"></tr>
+        </mat-table>
+    </mat-card-content>
+</mat-card> 

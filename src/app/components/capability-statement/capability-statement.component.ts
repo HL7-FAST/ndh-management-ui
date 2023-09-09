@@ -18,10 +18,10 @@ import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
 import {MatInputModule} from '@angular/material/input';
 import {MatExpansionModule} from '@angular/material/expansion';
-import {environment} from 'src/environments/environment';
 import {MatChipsModule} from "@angular/material/chips";
 import {MatTableModule} from "@angular/material/table";
 import {ResourceModule} from "./resource/resource.component";
+import { ConfigService } from 'src/app/services/config.service';
 
 @Component({
   selector: 'app-capability-statement',
@@ -56,11 +56,11 @@ export class CapabilityStatementComponent implements OnInit {
 
   searchParamTableColumns = ['name', 'type', 'documentation'];
 
-  constructor(private resourceService: ResourceService, private snackBar: MatSnackBar, private clipboard: Clipboard) {}
+  constructor(private configService: ConfigService, private resourceService: ResourceService, private snackBar: MatSnackBar, private clipboard: Clipboard) {}
   
   ngOnInit(): void {
     this.fhirServerForm = new FormGroup({
-      fhirSever: new FormControl(environment.baseApiUrl, Validators.required)
+      fhirSever: new FormControl(this.configService.baseApiUrl, Validators.required)
     });
     this.getCapabilityStatement();
   }

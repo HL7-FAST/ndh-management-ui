@@ -38,7 +38,7 @@ export class ResourceService {
       map((response: any) => {
         return response;
       }),
-      catchError(this.handleError)
+      catchError(this.errorHandler.handleError)
     );
   }
 
@@ -58,7 +58,7 @@ export class ResourceService {
         map((response: any) => {
           return response;
         }),
-        catchError(this.handleError)
+        catchError(this.errorHandler.handleError)
       );
   }
 
@@ -70,7 +70,7 @@ export class ResourceService {
         map((response: any) => {
           return response;
         }),
-        catchError(this.handleError)
+        catchError(this.errorHandler.handleError)
       );
   }
 
@@ -84,7 +84,7 @@ export class ResourceService {
         map((response: any) => {
           return response;
         }),
-        catchError(this.handleError)
+        catchError(this.errorHandler.handleError)
       );
   }
 
@@ -115,7 +115,7 @@ export class ResourceService {
       map((response: Bundle<any>) => {
         return response;
       }),
-      catchError(this.handleError)
+      catchError(this.errorHandler.handleError)
     );
   }
 
@@ -196,11 +196,7 @@ export class ResourceService {
         map((response: any) => {
           return response;
         }),
-        catchError(this.handleError)
+        catchError(this.errorHandler.handleError)
       );
-  }
-
-  protected handleError(err: HttpErrorResponse) {
-    return this.errorHandler.handleError(err);
   }
 }

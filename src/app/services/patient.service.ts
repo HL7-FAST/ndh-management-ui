@@ -4,14 +4,17 @@ import { Observable, throwError } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
 import { Bundle, Patient, Resource, Parameters } from 'fhir/r4';
 import { environment } from 'src/environments/environment';
+import { ConfigService } from './config.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PatientService { 
-  private baseApiUrl = `${environment.baseApiUrl}`;
+  private baseApiUrl: string;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private configService: ConfigService) { 
+    this.baseApiUrl = this.configService.baseApiUrl;
+  }
 
   list(queryString: string): Observable<Bundle<Patient>> {
 

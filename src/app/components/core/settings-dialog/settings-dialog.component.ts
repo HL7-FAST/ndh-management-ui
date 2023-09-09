@@ -11,6 +11,8 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { environment } from 'src/environments/environment';
 import { ThemePickerComponent } from "../theme-picker/theme-picker.component";
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { Observable, map, startWith } from 'rxjs';
 
 @Component({
     selector: 'app-settings-dialog',
@@ -19,6 +21,7 @@ import { ThemePickerComponent } from "../theme-picker/theme-picker.component";
     styleUrls: ['./settings-dialog.component.scss'],
     imports: [
         CommonModule,
+        MatAutocompleteModule,
         MatButtonModule,
         MatDialogModule,
         MatFormFieldModule,
@@ -33,6 +36,7 @@ import { ThemePickerComponent } from "../theme-picker/theme-picker.component";
 export class SettingsDialogComponent implements OnInit {
 
   settingsForm!: FormGroup;
+  filteredUrls!: Observable<string[]>;
 
   constructor(
     private dialogRef: MatDialogRef<SettingsDialogComponent>,
@@ -47,6 +51,16 @@ export class SettingsDialogComponent implements OnInit {
       baseApiUrl: new FormControl(this.configService.baseApiUrl, Validators.required),
       includeUnattested: new FormControl(this.configService.includeUnattested, Validators.required)
     });
+
+    this.filteredUrls = this.baseApiUrlControl.valueChanges.pipe(
+      startWith(''),
+      map(value => this.filterUrls(value || ''))
+    );
+  }
+
+  private filterUrls(value: string): Array<string> {
+    const sorted = this.configService.availableBaseApiUrls.sort();
+    return sorted.filter(u => u.toLowerCase().includes(value.toLowerCase()))
   }
 
 
@@ -60,7 +74,7 @@ export class SettingsDialogComponent implements OnInit {
 
 
   reset() {
-    this.baseApiUrlControl.setValue(environment.baseApiUrl);
+    this.baseApiUrlControl.setValue(environment.baseApiUrls[0]);
     this.includeUnattestedControl.setValue(false);
     this.settingsForm.markAsDirty();
   }

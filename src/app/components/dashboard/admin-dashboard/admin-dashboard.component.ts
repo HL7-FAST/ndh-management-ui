@@ -28,26 +28,32 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 })
 export class AdminDashboardComponent implements AfterViewInit {
 
-  currentFhirServer: string = '';
-  serverIsOnline: boolean = false;
+  serverStatuses: Array<{ url: string; status: 'pending' | 'online' | 'offline'; }> = [];
 
   
   constructor(private configService: ConfigService, private resourceService: ResourceService) {
   }
 
   ngAfterViewInit(): void {
-    
-    this.currentFhirServer = this.configService.baseApiUrl;
-    this.serverIsOnline = false;
 
-    if (this.currentFhirServer) {
-      this.resourceService.getCapabilityStatement(this.currentFhirServer).subscribe(data => {
-        if (data) {
-          this.serverIsOnline = true;
-        } else {
-          this.serverIsOnline = false;
-        }
-      });
+    this.serverStatuses = this.configService.availableBaseApiUrls.map(s => {return { url: s, status: 'pending' }});
+
+    if (this.serverStatuses && this.serverStatuses.length > 0) {
+      for (let i = 0; i < this.serverStatuses.length; i++) {
+        this.resourceService.getCapabilityStatement(this.serverStatuses[i].url).subscribe({
+          next: (data) => {
+            if (data) {
+              this.serverStatuses[i].status = 'online';
+            } else {
+              this.serverStatuses[i].status = 'offline';
+            }
+          },
+          error: (err) => {
+            this.serverStatuses[i].status = 'offline';
+          }
+        });
+      };
+      
     }
 
   }

@@ -44,7 +44,7 @@ import { MatBadgeModule } from '@angular/material/badge';
     imports: [
         OAuthModule.forRoot({
             resourceServer: {
-                allowedUrls: [`${environment.baseApiUrl}`],
+                allowedUrls: [`${environment.baseApiUrls[0]}`],
                 sendAccessToken: true
             }
         }),

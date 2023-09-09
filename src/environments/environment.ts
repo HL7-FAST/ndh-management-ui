@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  baseApiUrl: "https://national-directory.fast.hl7.org/fhir",
+  baseApiUrls: ["https://national-directory.fast.hl7.org/fhir", "http://localhost:8080/fhir"],
   authBypassSessionKey: "auth-bypass-header-enabled",
   idpIssuer: "https://oauth.lantanagroup.com/auth/realms/Connectathon",
   idpClientId: 'fast-identity-matching', //ndh-management

@@ -192,7 +192,6 @@ export class ResourceService {
     return this.http
       .get<CapabilityStatement>(`${resourceServer}/metadata`)
       .pipe(
-        tap((_) => console.log(`submit request for capability statement`)),
         map((response: any) => {
           return response;
         }),

@@ -1,4 +1,4 @@
-import { AfterViewInit, Component } from '@angular/core';
+import { AfterViewInit, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatCardModule } from '@angular/material/card';
@@ -26,7 +26,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
   templateUrl: './admin-dashboard.component.html',
   styleUrls: ['./admin-dashboard.component.scss']
 })
-export class AdminDashboardComponent implements AfterViewInit {
+export class AdminDashboardComponent implements OnInit {
 
   serverStatuses: Array<{ url: string; status: 'pending' | 'online' | 'offline'; }> = [];
 
@@ -34,7 +34,7 @@ export class AdminDashboardComponent implements AfterViewInit {
   constructor(private configService: ConfigService, private resourceService: ResourceService) {
   }
 
-  ngAfterViewInit(): void {
+  ngOnInit(): void {
 
     this.serverStatuses = this.configService.availableBaseApiUrls.map(s => {return { url: s, status: 'pending' }});
 

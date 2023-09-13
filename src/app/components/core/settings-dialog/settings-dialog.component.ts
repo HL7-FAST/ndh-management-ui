@@ -4,7 +4,7 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { ConfigService } from 'src/app/services/config.service';
 import { MatInputModule } from '@angular/material/input';
-import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
@@ -13,6 +13,8 @@ import { environment } from 'src/environments/environment';
 import { ThemePickerComponent } from "../theme-picker/theme-picker.component";
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { Observable, map, startWith } from 'rxjs';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { DeleteItemDialogComponent } from '../delete-item-dialog/delete-item-dialog.component';
 
 @Component({
     selector: 'app-settings-dialog',
@@ -28,6 +30,7 @@ import { Observable, map, startWith } from 'rxjs';
         MatIconModule,
         MatInputModule,
         MatSlideToggleModule,
+        MatSnackBarModule,
         MatTooltipModule,
         ReactiveFormsModule,
         ThemePickerComponent
@@ -40,6 +43,8 @@ export class SettingsDialogComponent implements OnInit {
 
   constructor(
     private dialogRef: MatDialogRef<SettingsDialogComponent>,
+    private dialog: MatDialog, 
+    private snackBar: MatSnackBar,
     private configService: ConfigService) {
 
       this.dialogRef.updateSize('75vw');
@@ -60,7 +65,7 @@ export class SettingsDialogComponent implements OnInit {
 
   private filterUrls(value: string): Array<string> {
     const sorted = this.configService.availableBaseApiUrls.sort();
-    return sorted.filter(u => u.toLowerCase().includes(value.toLowerCase()))
+    return sorted.filter(u => u.toLowerCase().includes(value.toLowerCase()));
   }
 
 
@@ -86,6 +91,30 @@ export class SettingsDialogComponent implements OnInit {
     this.configService.includeUnattested = this.includeUnattestedControl.value;
 
     this.dialogRef.close(true);
+  }
+
+
+  showDeleteServerDialog(url: string) {
+    
+    this.dialog.open(DeleteItemDialogComponent, {
+      
+    }).afterClosed().subscribe(async res => {
+      if (res) {
+
+        this.configService.removeAvailableBaseApiUrls(url);
+        console.log('res:', res);
+        this.snackBar.open(`Successfully removed ${url}`, '', {
+          duration: 3500,
+          panelClass: 'success-snackbar',
+          horizontalPosition: 'end',
+          verticalPosition: 'top'
+        });
+        
+      }
+
+    })
+
+    
   }
 
 

@@ -21,7 +21,12 @@
           [matAutocomplete]="auto">
         <mat-autocomplete #auto="matAutocomplete">
           <mat-option *ngFor="let url of filteredUrls | async" [value]="url">
-            {{url}}
+            <span style="display: flex; align-items: center; width: 100%;">
+              <button mat-icon-button matTooltip="Remove server from local list" class="row-expansion-btn" (click)="showDeleteServerDialog(url)">
+                <mat-icon>delete</mat-icon>
+              </button>
+              {{url}}
+              </span>
           </mat-option>
         </mat-autocomplete>
         <mat-error *ngIf="baseApiUrlControl.hasError('required')">

@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { OAuthModule } from 'angular-oauth2-oidc';
 import { BrowserModule } from '@angular/platform-browser';
-import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -32,17 +32,10 @@ import { MatBadgeModule } from '@angular/material/badge';
 
 
 
-@NgModule({
-    declarations: [
+@NgModule({ declarations: [
         AppComponent
     ],
-    providers: [
-        StyleManagerService,
-        httpInterceptorProviders
-    ],
-    bootstrap: [AppComponent],
-    imports: [
-        OAuthModule.forRoot({
+    bootstrap: [AppComponent], imports: [OAuthModule.forRoot({
             resourceServer: {
                 allowedUrls: [`${environment.baseApiUrls[0]}`],
                 sendAccessToken: true
@@ -51,7 +44,6 @@ import { MatBadgeModule } from '@angular/material/badge';
         BrowserModule,
         AppRoutingModule,
         BrowserAnimationsModule,
-        HttpClientModule,
         AppRoutingModule,
         LayoutModule,
         MatToolbarModule,
@@ -69,7 +61,9 @@ import { MatBadgeModule } from '@angular/material/badge';
         AuthBypassComponent,
         SettingsDialogComponent,
         MatBadgeModule,
-        ApiLogComponent
-    ]
-})
+        ApiLogComponent], providers: [
+        StyleManagerService,
+        httpInterceptorProviders,
+        provideHttpClient(withInterceptorsFromDi())
+    ] })
 export class AppModule { }

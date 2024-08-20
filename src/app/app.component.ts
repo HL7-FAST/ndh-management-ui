@@ -4,11 +4,10 @@ import { Breakpoints, BreakpointObserver } from '@angular/cdk/layout';
 import { Observable, map, shareReplay } from 'rxjs';
 import { UserProfileService } from './services/core/user-profile.service';
 import { AuthenticationService } from './services/auth/authentication.service';
-import { ConfigService } from './services/config.service';
 import { MatDialog } from '@angular/material/dialog';
 import { SettingsDialogComponent } from './components/core/settings-dialog/settings-dialog.component';
-import { Router } from '@angular/router';
 import { ApiLogComponent } from './components/core/api-log/api-log.component';
+import { MatIconRegistry } from '@angular/material/icon';
 
 @Component({
   selector: 'app-root',
@@ -29,15 +28,20 @@ export class AppComponent implements OnInit, AfterViewInit {
       shareReplay()
     );
 
-  constructor(private breakpointObserver: BreakpointObserver, private authService: AuthenticationService, private profileService: UserProfileService, private dialog: MatDialog, private router: Router, private cdr: ChangeDetectorRef) {
-
-    
-
-  }
+  constructor(
+    private breakpointObserver: BreakpointObserver,
+    private authService: AuthenticationService,
+    private profileService: UserProfileService,
+    private dialog: MatDialog,
+    private iconRegistry: MatIconRegistry,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
 
     this.availableUserProfiles = this.profileService.userList;
+
+    this.iconRegistry.setDefaultFontSetClass('material-symbols-outlined');
 
     this.profileService.userProfileUpdated.subscribe(profile => {
       this.currentUserProfile = profile;

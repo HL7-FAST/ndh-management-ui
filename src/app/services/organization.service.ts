@@ -1,27 +1,27 @@
 import { Injectable } from '@angular/core';
 import { ResourceService } from './core/resource.service';
-import { Bundle, Organization, Resource } from 'fhir/r4';
+import { Organization } from 'fhir/r4';
 import { Observable, firstValueFrom } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
-export class OrganizationService extends ResourceService { 
+export class OrganizationService extends ResourceService<Organization> { 
   resourceType = 'Organization';
 
   get(organizationId: string): Observable<Organization> {
     return super.getResource(this.resourceType, organizationId);
   }
 
-  create(organization: Organization): Observable<Bundle<Organization>> {
+  create(organization: Organization): Observable<Organization> {
     return super.createResource(this.resourceType, organization);
   }
 
-  update(id: string, organization: Organization): Observable<Bundle<Organization>> {
+  update(id: string, organization: Organization): Observable<Organization> {
     return super.updateResource(this.resourceType, id, organization);
   }
 
-  delete(id: string): Observable<Bundle<Organization>> {
+  delete(id: string): Observable<Organization> {
     return super.deleteResource(this.resourceType, id);
   }
 

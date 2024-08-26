@@ -1,10 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
-import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { Bundle, BundleEntry, DomainResource, Organization, PractitionerRole } from 'fhir/r4';
+import { Bundle, BundleEntry, Organization, PractitionerRole } from 'fhir/r4';
 import { PaginationMetadata } from 'src/app/models/pagination-metadata.model';
 import { OrganizationService } from 'src/app/services/organization.service';
 import { OrganizationViewDialogComponent } from '../organization-view-dialog/organization-view-dialog.component';
@@ -17,229 +17,305 @@ import basePractitionerRole from '../../../../assets/fhir/PractitionerRole-ndh.j
 import { PractitionerRoleService } from 'src/app/services/practitioner-role.service';
 import { AttestationUtils } from 'src/app/utils/attestation-utils';
 import { firstValueFrom } from 'rxjs';
-import { ApiLogComponent } from '../../core/api-log/api-log.component';
 import { UserProfileService } from 'src/app/services/core/user-profile.service';
 import { IUserProfile } from 'src/app/interfaces/user-profile.interface';
 import { AttestedFilterWarningComponent } from "../../core/attested-filter-warning/attested-filter-warning.component";
+import { FhirPageEvent, FhirPaginatorComponent } from "../../core/fhir-paginator/fhir-paginator.component";
+import { VerificationUtils } from 'src/app/utils/verification-utils';
+import { VerificationDialogComponent } from '../../verification/verification-dialog/verification-dialog.component';
 
 @Component({
-    selector: 'app-organization-list',
-    standalone: true,
-    templateUrl: './organization-list.component.html',
-    styleUrls: ['./organization-list.component.scss'],
-    imports: [
-        CommonModule,
-        MatButtonModule,
-        MatDialogModule,
-        MatIconModule,
-        MatPaginatorModule,
-        MatTableModule,
-        MatSnackBarModule,
-        MatToolbarModule,
-        AttestedFilterWarningComponent
-    ]
+  selector: 'app-organization-list',
+  standalone: true,
+  templateUrl: './organization-list.component.html',
+  styleUrls: ['./organization-list.component.scss'],
+  imports: [
+    CommonModule,
+    MatButtonModule,
+    MatDialogModule,
+    MatIconModule,
+    MatTableModule,
+    MatSnackBarModule,
+    MatToolbarModule,
+    AttestedFilterWarningComponent,
+    FhirPaginatorComponent,
+  ],
 })
 export class OrganizationListComponent implements OnInit {
-  pageSize: number = 20;
-  pageNumber: number = 0;
-  totalCount: number = 0;
-  nextLink: string = '';
-  prevLink: string = '';
+  pageSize = 20;
+  nextLink?: string;
+  prevLink?: string;
 
   currentUser?: IUserProfile = undefined;
-  organizations: Array<Organization> = [];
-  paginationMetadata: PaginationMetadata = new PaginationMetadata;
+  organizations: Organization[] = [];
+  paginationMetadata: PaginationMetadata = new PaginationMetadata();
 
-  displayedColumns: string[] = [ 'id', 'name', 'attested', 'actions' ];
-  dataSource = new MatTableDataSource<BundleEntry<Organization>>(this.organizations);
+  displayedColumns: string[] = ['id', 'name', 'attested', 'verification', 'actions'];
+  dataSource = new MatTableDataSource<BundleEntry<Organization>>(
+    this.organizations
+  );
   isAttested = AttestationUtils.getIsAttested;
+  getVerificationStatus = VerificationUtils.getVerificationStatus;
 
-
-  
-  constructor(private organizationService: OrganizationService, private practitionerRoleService: PractitionerRoleService, private userProfileService: UserProfileService, private dialog: MatDialog, private snackBar: MatSnackBar) {
-    this.getOrganizations(this.defaultLink);
-  }
-
+  constructor(
+    private organizationService: OrganizationService,
+    private practitionerRoleService: PractitionerRoleService,
+    private userProfileService: UserProfileService,
+    private dialog: MatDialog,
+    private snackBar: MatSnackBar
+  ) {}
 
   ngOnInit(): void {
-    this.userProfileService.userProfileUpdated.subscribe(profile => {
-      this.currentUser = profile;
-      this.getOrganizations(this.defaultLink);
-    });
+    this.currentUser = this.userProfileService.getProfile();
+    this.getOrganizations();
   }
 
-
-  get defaultLink(): string {
-    return `?_count=${this.pageSize}&_total=accurate&_has:PractitionerRole:organization:practitioner.telecom=${this.currentUser?.email}`;
+  getQueryString(): string {
+    return `?_count=${this.pageSize}`;
+    // return `?_count=${this.pageSize}&_has:PractitionerRole:organization:practitioner.telecom=${this.currentUser?.email}`;
   }
-  
 
-  getOrganizations(queryString: string) {
-    this.organizations = [];
+  getOrganizations() {
+    console.log('getOrganizations', this.getQueryString());
+    this.organizationService
+      .searchResource('Organization', this.getQueryString())
+      .subscribe((data) => this.processSearchResults(data));
+  }
 
-    if (!this.currentUser) {
-      return;
+  async fhirPagedEvent(event: FhirPageEvent) {
+    if (event.action === 'size') {
+      this.pageSize = event.pageSize;
+      this.getOrganizations();
+    } else if (
+      (event.action === 'next' || event.action === 'prev') &&
+      event.currentLink
+    ) {
+      this.processSearchResults(
+        await this.organizationService.getLink(event.currentLink)
+      );
     }
-
-    this.organizationService.searchResource('Organization', queryString).subscribe((data: Bundle<Organization>) => {
-      this.organizations = (data.entry || [])
-        .filter(e => e.resource?.resourceType === 'Organization')
-        .map(e => e.resource as Organization);
-
-      this.totalCount = data.total ? data.total : 0;
-      
-      if(data.link) {
-        let next = data.link.find(x => x.relation === "next");
-        this.nextLink = next ? next.url : '';
-
-        let prev = data.link.find(x => x.relation === "previous");
-        this.prevLink = prev ? prev.url : '';
-      }      
-    });
   }
 
+  processSearchResults(data: Bundle<Organization>) {
+    this.organizations = [];
+    this.nextLink = '';
+    this.prevLink = '';
+
+    this.organizations = (data.entry || [])
+      .filter((e) => e.resource?.resourceType === 'Organization')
+      .map((e) => e.resource as Organization);
+
+    if (data.link) {
+      const next = data.link.find((x) => x.relation === 'next');
+      this.nextLink = next ? next.url : '';
+
+      const prev = data.link.find((x) => x.relation === 'previous');
+      this.prevLink = prev ? prev.url : '';
+    }
+  }
 
   pagedEvent(event: PageEvent) {
-    if(this.pageSize != event.pageSize) {
-      this.pageNumber = 0;
+    if (this.pageSize != event.pageSize) {
       this.pageSize = event.pageSize;
-      this.getOrganizations(this.defaultLink);
-    }
-    else if(this.pageNumber < event.pageSize) {
-      this.getOrganizations(this.nextLink);
-    }
-    else {
-      this.getOrganizations(this.prevLink);
+      this.getOrganizations();
     }
   }
 
-
-  showOrganizationViewDialog($event: Event, organization: Organization) : void {
-
-    this.dialog.open(OrganizationViewDialogComponent,
-      {
-        width: '75%',
-        data: { dialogTitle: `Organization record for ${organization ? organization.name : 'unknown'}`, organization: organization }
-      });
+  showOrganizationViewDialog($event: Event, organization: Organization): void {
+    this.dialog.open(OrganizationViewDialogComponent, {
+      width: '75%',
+      data: {
+        dialogTitle: `Organization record for ${
+          organization ? organization.name || organization.id : 'unknown'
+        }`,
+        organization: organization,
+      },
+    });
   }
 
-  showCreateOrganizationDialog() : void {
-
-    this.dialog.open(OrganizationFormDialogComponent,
-      {
+  showCreateOrganizationDialog(): void {
+    this.dialog
+      .open(OrganizationFormDialogComponent, {
         width: '75%',
-        data: { dialogTitle: `Create a new Organization`, organization: null }
-      }).afterClosed().subscribe(res => {
+        data: { dialogTitle: `Create a new Organization`, organization: null },
+      })
+      .afterClosed()
+      .subscribe((res) => {
         console.log(res);
         if (res) {
           this.snackBar.open(`Saved Organization ${res.id}`, '', {
             duration: 3500,
             panelClass: 'success-snackbar',
             horizontalPosition: 'end',
-            verticalPosition: 'top'
+            verticalPosition: 'top',
           });
 
           // create PractionerRole for this new Organization
-          const newPractionerRole: PractitionerRole = {...basePractitionerRole} as PractitionerRole;
-          newPractionerRole.practitioner = { reference: `Practitioner/${this.currentUser?.username}` };
-          newPractionerRole.organization = { reference: `Organization/${res.id}` };
+          const newPractionerRole: PractitionerRole = {
+            ...basePractitionerRole,
+          } as PractitionerRole;
+          newPractionerRole.practitioner = {
+            reference: `Practitioner/${this.currentUser?.practitioner}`,
+          };
+          newPractionerRole.organization = {
+            reference: `Organization/${res.id}`,
+          };
 
-          this.practitionerRoleService.createResource('PractitionerRole', newPractionerRole).subscribe(pr => {
-            if (pr) {
-              this.snackBar.open(`Saved PractionerRole ${pr?.id}`, '', {
-                duration: 3500,
-                panelClass: 'success-snackbar',
-                horizontalPosition: 'end',
-                verticalPosition: 'top'
-              });
-            }
-            this.getOrganizations(this.defaultLink);
-          });          
+          this.practitionerRoleService
+            .createResource('PractitionerRole', newPractionerRole)
+            .subscribe((pr) => {
+              if (pr) {
+                this.snackBar.open(`Saved PractionerRole ${pr?.id}`, '', {
+                  duration: 3500,
+                  panelClass: 'success-snackbar',
+                  horizontalPosition: 'end',
+                  verticalPosition: 'top',
+                });
+              }
+              this.getOrganizations();
+            });
         }
       });
   }
 
   showEditOrganizationDialog($event: Event, organization: Organization) {
-
     $event.stopPropagation();
 
     if (organization) {
-      this.dialog.open(OrganizationFormDialogComponent,{
-        width: '75%',
-        data: { dialogTitle: `Edit organization record for ${organization ? organization.name : 'unknown'}`, organization: organization }
-      }).afterClosed().subscribe(res => {
-        if (res) {
-          this.getOrganizations(this.defaultLink);
-          this.snackBar.open(`Saved ${res?.id}`, '', {
-            duration: 3500,
-            panelClass: 'success-snackbar',
-            horizontalPosition: 'end',
-            verticalPosition: 'top'
-          });
-        }
-      });
-    }
-    else {
+      this.dialog
+        .open(OrganizationFormDialogComponent, {
+          width: '75%',
+          data: {
+            dialogTitle: `Edit organization record for ${
+              organization ? organization.name || organization.id : 'unknown'
+            }`,
+            organization: organization,
+          },
+        })
+        .afterClosed()
+        .subscribe((res) => {
+          if (res) {
+            this.getOrganizations();
+            console.log('saved: ', res);
+            let message = `Saved ${res?.id || 'Organization'}`;
+            if (
+              res?.resourceType === 'OperationOutcome' &&
+              res.issue &&
+              res.issue.length > 0
+            ) {
+              message = res.issue[0].diagnostics || message;
+            }
+            this.snackBar.open(message, '', {
+              duration: 3500,
+              panelClass: 'success-snackbar',
+              horizontalPosition: 'end',
+              verticalPosition: 'top',
+            });
+          }
+        });
+    } else {
       this.snackBar.open(`Invalid organization resource`, '', {
         duration: 3500,
         panelClass: 'error-snackbar',
         horizontalPosition: 'end',
-        verticalPosition: 'top'
+        verticalPosition: 'top',
       });
     }
-
   }
 
   showDeleteOrganizationDialog($event: Event, organization: Organization) {
-
     $event.stopPropagation();
 
-    let organizationId = organization?.id ? organization.id : '';
+    const organizationId = organization?.id ? organization.id : '';
 
     if (organization && organizationId.length > 0) {
-      this.dialog.open(DeleteItemDialogComponent, {
-      }).afterClosed().subscribe(async res => {
-        if (res) {
-
-          let prIds = await this.practitionerRoleService.getAllIds('PractitionerRole', `?organization=${organizationId}`);
-          if (prIds && prIds.length > 0) {
-            await firstValueFrom(this.practitionerRoleService.deleteAllResourcesById('PractitionerRole', prIds));
-          }
-          
-          this.organizationService.deleteResource('Organization', organizationId).subscribe({
-            next: (outcome) => {
-              this.getOrganizations(this.defaultLink);
-              this.snackBar.open(`Successfully deleted the organization ${organization ? organization.name : 'unknown'}`, '', {
-                duration: 3500,
-                panelClass: 'success-snackbar',
-                horizontalPosition: 'end',
-                verticalPosition: 'top'
-              });
-            }, 
-            error: (err) => {
-              console.log(err);
-              this.snackBar.open(`Error deleting organization ${organization ? organization.name : 'unknown'}.  Check console.`, '', {
-                duration: 3500,
-                panelClass: 'error-snackbar',
-                horizontalPosition: 'end',
-                verticalPosition: 'top'
-              });
+      this.dialog
+        .open(DeleteItemDialogComponent, {})
+        .afterClosed()
+        .subscribe(async (res) => {
+          if (res) {
+            const prIds = await this.practitionerRoleService.getAllIds(
+              'PractitionerRole',
+              `?organization=${organizationId}`
+            );
+            if (prIds && prIds.length > 0) {
+              await firstValueFrom(
+                this.practitionerRoleService.deleteAllResourcesById(
+                  'PractitionerRole',
+                  prIds
+                )
+              );
             }
-          });
-        }
-      });
-    }
-    else {
+
+            this.organizationService
+              .deleteResource('Organization', organizationId)
+              .subscribe({
+                next: () => {
+                  this.getOrganizations();
+                  this.snackBar.open(
+                    `Successfully deleted the organization ${
+                      organization ? organization.name : 'unknown'
+                    }`,
+                    '',
+                    {
+                      duration: 3500,
+                      panelClass: 'success-snackbar',
+                      horizontalPosition: 'end',
+                      verticalPosition: 'top',
+                    }
+                  );
+                },
+                error: (err) => {
+                  console.log(err);
+                  this.snackBar.open(
+                    `Error deleting organization ${
+                      organization ? organization.name : 'unknown'
+                    }.  Check console.`,
+                    '',
+                    {
+                      duration: 3500,
+                      panelClass: 'error-snackbar',
+                      horizontalPosition: 'end',
+                      verticalPosition: 'top',
+                    }
+                  );
+                },
+              });
+          }
+        });
+    } else {
       this.snackBar.open(`Invalid organization id ${organizationId}`, '', {
         duration: 3500,
         panelClass: 'error-snackbar',
         horizontalPosition: 'end',
-        verticalPosition: 'top'
+        verticalPosition: 'top',
       });
     }
   }
 
 
-  
+  showVerificationDialog($event: Event, organization: Organization) {
+    $event.stopPropagation();
+
+    if (organization) {
+      this.dialog.open(VerificationDialogComponent, {
+        width: '75%',
+        data: {
+          dialogTitle: `Verify organization record for ${
+            organization ? organization.name || organization.id : 'unknown'
+          }`,
+          resource: organization,
+        },
+      });
+    } else {
+      this.snackBar.open(`Invalid organization resource`, '', {
+        duration: 3500,
+        panelClass: 'error-snackbar',
+        horizontalPosition: 'end',
+        verticalPosition: 'top',
+      });
+    }
+    
+  }
 
 }

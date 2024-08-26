@@ -30,17 +30,20 @@
               "src/favicon.ico",
               "src/assets"
             ],
-            "styles": [            
+            "styles": [
               "src/styles.scss",
               {
                 "inject": false,
                 "input": "src/styles/custom-themes/hl7-blue-theme.scss",
                 "bundleName": "hl7-blue"
-              }              
+              }
             ],
             "stylePreprocessorOptions": {
-              "includePaths": [ "src", "src/styles" ]
-            },       
+              "includePaths": [
+                "src",
+                "src/styles"
+              ]
+            },
             "scripts": [],
             "browser": "src/main.ts"
           },
@@ -106,8 +109,22 @@
             ],
             "scripts": []
           }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "src/**/*.ts",
+              "src/**/*.html"
+            ]
+          }
         }
       }
     }
+  },
+  "cli": {
+    "schematicCollections": [
+      "@angular-eslint/schematics"
+    ]
   }
 }

@@ -1,0 +1,25 @@
+.app-fhir-paginator {
+  display: block;
+}
+
+
+
+.fhir-paginator-container {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  
+  padding: 0 8px;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.fhir-paginator-page-size {
+  display: flex;
+  align-items: baseline;
+}
+
+.fhir-paginator-actions {
+  display: flex;
+  align-items: center;
+}

@@ -1,6 +1,6 @@
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, catchError, filter, firstValueFrom, map, tap } from 'rxjs';
+import { Observable, catchError, firstValueFrom, map, tap } from 'rxjs';
 import { ErrorHandlingService } from './error-handling.service';
 import { Bundle, CapabilityStatement, Meta, OperationOutcome, Parameters, Resource } from 'fhir/r4';
 import { ConfigService } from '../config.service';
@@ -8,7 +8,7 @@ import { ConfigService } from '../config.service';
 @Injectable({
   providedIn: "root",
 })
-export class ResourceService {
+export class ResourceService<T extends Resource> {
   protected baseApiUrl: string;
 
   protected availableResources: string[] = ["Endpoint", "Organization"];
@@ -33,55 +33,55 @@ export class ResourceService {
     this.availableResources = [...resources];
   }
 
-  getResource(resourceType: string, id: string): Observable<any> {
-    return this.http.get<any>(`${this.baseApiUrl}/${resourceType}/${id}`).pipe(
-      map((response: any) => {
+  getResource(resourceType: string, id: string): Observable<T> {
+    return this.http.get<T>(`${this.baseApiUrl}/${resourceType}/${id}`).pipe(
+      map((response: T) => {
         return response;
       }),
       catchError(this.errorHandler.handleError)
     );
   }
 
-  createResource(resourceType: string, resource: Resource): Observable<any> {
-    let request: Observable<any>;
-    let url = `${this.baseApiUrl}/${resourceType}`;
+  createResource(resourceType: string, resource: T): Observable<T> {
+    let request: Observable<T>;
+    const url = `${this.baseApiUrl}/${resourceType}`;
 
     if (resource.id && resource.id.length > 0) {
-      request = this.http.put(`${url}/${resource.id}`, resource);
+      request = this.http.put<T>(`${url}/${resource.id}`, resource);
     }
     else {
-      request = this.http.post(url, resource);
+      request = this.http.post<T>(url, resource);
     }
 
     return request.pipe(
-        tap((_) => console.log(`saving resource`)),
-        map((response: any) => {
+        tap(() => console.log(`saving resource`)),
+        map((response: T) => {
           return response;
         }),
         catchError(this.errorHandler.handleError)
       );
   }
 
-  updateResource(resourceType: string, id: string, resource: Resource): Observable<any> {
+  updateResource(resourceType: string, id: string, resource: T): Observable<T> {
     return this.http
-      .put<any>(`${this.baseApiUrl}/${resourceType}/${id}`, resource)
+      .put<T>(`${this.baseApiUrl}/${resourceType}/${id}`, resource)
       .pipe(
-        tap((_) => console.log(`saving resource`)),
-        map((response: any) => {
+        tap(() => console.log(`saving resource`)),
+        map((response: T) => {
           return response;
         }),
         catchError(this.errorHandler.handleError)
       );
   }
 
-  deleteResource(resourceType: string, id: string): Observable<any> {
-    let url = `${this.baseApiUrl}/${resourceType}/${id}`;
+  deleteResource(resourceType: string, id: string): Observable<T> {
+    const url = `${this.baseApiUrl}/${resourceType}/${id}`;
 
     return this.http
-      .delete<any>(url)
+      .delete<T>(url)
       .pipe(
-        tap((_) => console.log(`submit resource for deletion`)),
-        map((response: any) => {
+        tap(() => console.log(`submit resource for deletion`)),
+        map((response: T) => {
           return response;
         }),
         catchError(this.errorHandler.handleError)
@@ -90,7 +90,7 @@ export class ResourceService {
 
   deleteAllResourcesById(resourceType: string, ids: string[]): Observable<OperationOutcome> {
 
-    let transaction: Bundle = { resourceType: 'Bundle', type: 'transaction', entry: [] };
+    const transaction: Bundle = { resourceType: 'Bundle', type: 'transaction', entry: [] };
 
     (ids || []).forEach(id => transaction.entry?.push({ request: { method: 'DELETE', url: `${resourceType}/${id}` } }));
 
@@ -99,8 +99,9 @@ export class ResourceService {
 
 
 
-  searchResource(resourceType: string, queryString: string): Observable<Bundle<any>> {
+  searchResource(resourceType: string, queryString: string): Observable<Bundle<T>> {
     let requestUrl = `${this.baseApiUrl}/${resourceType}`;
+    queryString = encodeURI(queryString);
 
     if (queryString.startsWith(`${this.baseApiUrl}`)) {
       requestUrl = queryString;
@@ -111,8 +112,8 @@ export class ResourceService {
       requestUrl = requestUrl.concat(queryString);
     }
 
-    return this.http.get<Bundle<any>>(`${requestUrl}`).pipe(
-      map((response: Bundle<any>) => {
+    return this.http.get<Bundle<T>>(`${requestUrl}`).pipe(
+      map((response: Bundle<T>) => {
         return response;
       }),
       catchError(this.errorHandler.handleError)
@@ -120,44 +121,42 @@ export class ResourceService {
   }
 
 
-  protected async getNext(url: string): Promise<Resource[]> {
-    const resources: Resource[] = [];
-    let res = await firstValueFrom(this.http.get<Bundle<any>>(url));
-    resources.push(...(res.entry || []).map(r => r.resource));
+  async getLink(url: string): Promise<Bundle<T>> {
+    return firstValueFrom(this.http.get<Bundle<T>>(url));
+  }
 
-    if (res.link) {
-      const next = res.link.find(l => l.relation === 'next');
-      if (next) {
-        console.log('next:', next);
-        resources.push(... await this.getNext(next.url));
-      }
+  async getAll(resourceType: string, queryString: string): Promise<T[]> {
+    if (!queryString.startsWith('?')) {
+      queryString = `?${queryString}`;
+    }
+    queryString = encodeURI(queryString);
+
+    const requestUrl = `${this.baseApiUrl}/${resourceType}${queryString}`;
+
+    const resources: T[] = [];
+    const res = await this.getLink(requestUrl);
+    resources.push(...(res.entry || []).map(r => r.resource).filter((r): r is T => r !== undefined));
+
+    let next = res.link?.find(l => l.relation === 'next');
+
+    while (next) {
+      const nextResources = await this.getLink(next.url);
+      resources.push(...(nextResources.entry || []).map(r => r.resource).filter((r): r is T => r !== undefined));
+      next = nextResources.link?.find(l => l.relation === 'next');
     }
 
     return resources;
   }
-
-  async getAll(resourceType: string, queryString: string): Promise<any[]> {
-    if (!queryString.startsWith('?')) {
-      queryString = `?${queryString}`;
-    }
-    const requestUrl = `${this.baseApiUrl}/${resourceType}${queryString}`;
-    return await this.getNext(requestUrl);
-  }
   
-  async getAllIds(resourceType: string, queryString: string): Promise<string[]> {
-
-    if (!queryString.startsWith('?')) {
-      queryString = `?${queryString}`;
-    }
-    const requestUrl = `${this.baseApiUrl}/${resourceType}${queryString}`;
-    const res = await this.getNext(requestUrl);
+  async getAllIds(resourceType: string, queryString: string): Promise<string[]> {    
+    const res = await this.getAll(resourceType, queryString);
     return (res || []).map(r => r.id as string);
   }
 
 
-  metaAdd(resourceType: string, resourceId: string, valueMeta: Meta): Observable<any> {
+  metaAdd(resourceType: string, resourceId: string, valueMeta: Meta): Observable<Parameters> {
 
-    let url = `${this.baseApiUrl}/${resourceType}/${resourceId}/$meta-add`;
+    const url = `${this.baseApiUrl}/${resourceType}/${resourceId}/$meta-add`;
 
     const parameters: Parameters = {
       resourceType: 'Parameters',
@@ -167,13 +166,13 @@ export class ResourceService {
       }]
     };
 
-    return this.http.post(url, parameters);
+    return this.http.post<Parameters>(url, parameters);
 
   }
 
-  metaDelete(resourceType: string, resourceId: string, valueMeta: Meta): Observable<any> {
+  metaDelete(resourceType: string, resourceId: string, valueMeta: Meta): Observable<Parameters> {
 
-    let url = `${this.baseApiUrl}/${resourceType}/${resourceId}/$meta-delete`;
+    const url = `${this.baseApiUrl}/${resourceType}/${resourceId}/$meta-delete`;
 
     const parameters: Parameters = {
       resourceType: 'Parameters',
@@ -183,7 +182,7 @@ export class ResourceService {
       }]
     };
 
-    return this.http.post(url, parameters);
+    return this.http.post<Parameters>(url, parameters);
 
   }
 
@@ -192,7 +191,7 @@ export class ResourceService {
     return this.http
       .get<CapabilityStatement>(`${resourceServer}/metadata`)
       .pipe(
-        map((response: any) => {
+        map((response: CapabilityStatement) => {
           return response;
         }),
         catchError(this.errorHandler.handleError)

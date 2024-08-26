@@ -7,7 +7,7 @@ import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTableModule } from '@angular/material/table';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { Bundle, Endpoint, Organization } from 'fhir/r4';
+import { Endpoint, Organization } from 'fhir/r4';
 import { PaginationMetadata } from 'src/app/models/pagination-metadata.model';
 import { OrganizationService } from 'src/app/services/organization.service';
 import { MatSelectModule } from '@angular/material/select';
@@ -39,23 +39,23 @@ import { AttestedFilterWarningComponent } from "../../core/attested-filter-warni
     ]
 })
 export class EndpointListComponent implements OnInit {
-  endpoints: Array<Endpoint> = [];
-  organizations: Array<Organization> = [];
-  selectedOrganizationId: string = '';
-  pageSize: number = 20;
-  pageNumber: number = 0;
-  totalCount: number = 0;
+  endpoints: Endpoint[] = [];
+  organizations: Organization[] = [];
+  selectedOrganizationId = '';
+  pageSize = 20;
+  pageNumber = 0;
+  totalCount = 0;
   currentUser?: IUserProfile = undefined;
-  nextLink: string = '';
-  prevLink: string = '';
+  nextLink = '';
+  prevLink = '';
   paginationMetadata: PaginationMetadata = new PaginationMetadata;
 
   displayedColumns: string[] = [ 'id', 'name', 'attested', 'actions' ];
   isAttested = AttestationUtils.getIsAttested;
 
-  _defaultLink: string = '';
+  _defaultLink = '';
   get defaultLink(): string {
-    return `?_count=${this.pageSize}&_total=accurate&_has:Organization:endpoint:_id=${this.selectedOrganizationId}`;
+    return `?_count=${this.pageSize}&_has:Organization:endpoint:_id=${this.selectedOrganizationId}`;
   }
   set defaultLink(newLink: string) {
     this._defaultLink = newLink;
@@ -75,7 +75,7 @@ export class EndpointListComponent implements OnInit {
       this.organizations = [];
       this.selectedOrganizationId = '';
 
-      this.organizations = await this.organizationService.getAll(`?_has:PractitionerRole:organization:practitioner.telecom=${this.currentUser.email}&_sort=name&_summary=true`);
+      this.organizations = await this.organizationService.getAll(`?_has:PractitionerRole:organization:practitioner.telecom=${this.currentUser?.email}&_sort=name&_summary=true`);
 
       if (this.organizations && this.organizations.length > 0) {
         this.selectedOrganizationId = this.organizations[0].id as string;
@@ -101,10 +101,10 @@ export class EndpointListComponent implements OnInit {
       this.totalCount = data.total ? data.total : 0;
       
       if(data.link) {
-        let next = data.link.find(x => x.relation === "next");
+        const next = data.link.find(x => x.relation === "next");
         this.nextLink = next ? next.url : '';
 
-        let prev = data.link.find(x => x.relation === "previous");
+        const prev = data.link.find(x => x.relation === "previous");
         this.prevLink = prev ? prev.url : '';
       }
     });
@@ -131,7 +131,7 @@ export class EndpointListComponent implements OnInit {
     this.dialog.open(EndpointViewDialogComponent,
       {
         width: '75%',
-        data: { dialogTitle: `Endpoint record for ${endpoint ? endpoint.name : 'unknown'}`, endpoint: endpoint }
+        data: { dialogTitle: `Endpoint record for ${endpoint ? endpoint.name || endpoint.id : 'unknown'}`, endpoint: endpoint }
       });
   }
 
@@ -161,7 +161,7 @@ export class EndpointListComponent implements OnInit {
     if (endpoint) {
       this.dialog.open(EndpointFormDialogComponent,{
         width: '75%',
-        data: { dialogTitle: `Edit endpoint record for ${endpoint ? endpoint.name : 'unknown'}`, endpoint: endpoint, organizationId: this.selectedOrganizationId }
+        data: { dialogTitle: `Edit endpoint record for ${endpoint ? endpoint.name || endpoint.id : 'unknown'}`, endpoint: endpoint, organizationId: this.selectedOrganizationId }
       }).afterClosed().subscribe(res => {
         if (res) {
           this.getEndpoints();
@@ -187,7 +187,7 @@ export class EndpointListComponent implements OnInit {
   showDeleteEndpointDialog($event: Event, endpoint: Endpoint) {
     $event.stopPropagation();
 
-    let endpointId = endpoint?.id ? endpoint.id : '';
+    const endpointId = endpoint?.id ? endpoint.id : '';
 
     if (endpoint && endpointId.length > 0) {
       this.dialog.open(DeleteItemDialogComponent, {
@@ -197,7 +197,7 @@ export class EndpointListComponent implements OnInit {
           await this.organizationService.removeEndpoint(this.selectedOrganizationId, endpointId);
           
           this.endpointService.delete(endpointId).subscribe({
-            next: async (outcome) => {
+            next: async () => {
 
               this.getEndpoints();
               this.snackBar.open(`Successfully deleted the endpoint ${endpoint ? endpoint.name : 'unknown'}`, '', {

@@ -1,9 +1,9 @@
-import { Coding, Meta, Resource } from "fhir/r4";
+import { Coding, Resource } from "fhir/r4";
 
 export class AttestationUtils {
 
-  static notAttestedSystem: string = 'http://terminology.hl7.org/CodeSystem/v3-Confidentiality';
-  static notAttestedCode: string = 'V';
+  static notAttestedSystem = 'http://terminology.hl7.org/CodeSystem/v3-Confidentiality';
+  static notAttestedCode = 'V';
 
   static getNotAttestedSecurityCoding(): Coding {
     return { system: AttestationUtils.notAttestedSystem, code: AttestationUtils.notAttestedCode };
@@ -18,7 +18,7 @@ export class AttestationUtils {
   }
 
 
-  static toggleAttested(resource: Resource): any {
+  static toggleAttested(resource: Resource): void {
 
     if (!resource.meta) {
       resource.meta = {};

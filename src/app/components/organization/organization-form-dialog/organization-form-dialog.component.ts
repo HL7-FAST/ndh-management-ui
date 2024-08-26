@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, Inject, OnInit } from '@angular/core';
-import { FormArray, FormControl, FormGroup, FormsModule, NgModel, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormArray, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -8,7 +8,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { Meta, Organization } from 'fhir/r4';
+import { Organization } from 'fhir/r4';
 import { FormMode } from 'src/app/models/FormMode.enum';
 import { OrganizationService } from 'src/app/services/organization.service';
 import { FhirFormUtils } from '../../../utils/fhir-form-utils';
@@ -18,6 +18,8 @@ import { AttestationUtils } from 'src/app/utils/attestation-utils';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { AttestationService } from 'src/app/services/attestation.service';
+import { UserProfileService } from 'src/app/services/core/user-profile.service';
 
 @Component({
   selector: 'app-organization-form-dialog',
@@ -57,7 +59,10 @@ export class OrganizationFormDialogComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: { dialogTitle: string, organization: Organization },
     private dialogRef: MatDialogRef<OrganizationFormDialogComponent>, 
     private snackBar: MatSnackBar, 
-    private organizationService: OrganizationService) {
+    private attestationService: AttestationService,
+    private organizationService: OrganizationService,
+    private profileService: UserProfileService
+  ) {
       this.organization = data.organization;
     }
 
@@ -77,8 +82,6 @@ export class OrganizationFormDialogComponent implements OnInit {
       telecom: FhirFormUtils.getContactPointFormArray(this.organization.telecom, false),
       identifier: FhirFormUtils.getIdentifierFormArray(this.organization.identifier, false)
     });
-
-    this.resetAttestedChecked = this.isAttested(this.organization);
 
   }
 
@@ -144,10 +147,8 @@ export class OrganizationFormDialogComponent implements OnInit {
 
   markAttested() {
     
-    const valueMeta: Meta = { security: [AttestationUtils.getNotAttestedSecurityCoding()] };
-
-    this.organizationService.metaDelete('Organization', this.organization.id as string, valueMeta).subscribe(data => {
-      console.log(data);
+    this.attestationService.attestResource(this.organization).subscribe(data => {
+      console.log("markAttested:", data);
       if(data) {
         this.dialogRef.close(data);
       }        
@@ -166,9 +167,7 @@ export class OrganizationFormDialogComponent implements OnInit {
 
   markUnattested() {
     
-    const valueMeta: Meta = { security: [AttestationUtils.getNotAttestedSecurityCoding()] };
-
-    this.organizationService.metaAdd('Organization', this.organization.id as string, valueMeta).subscribe(data => {
+    this.attestationService.unAttestResource(this.organization).subscribe(data => {
       console.log(data);
       if(data) {
         this.dialogRef.close(data);

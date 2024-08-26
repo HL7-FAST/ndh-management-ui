@@ -9,7 +9,7 @@ import { filter } from 'rxjs';
   providedIn: 'root'
 })
 export class AuthenticationService {
-  userProfile!: UserProfile;
+  userProfile?: UserProfile;
   
 
   constructor(private oauthService: OAuthService, private profileService: UserProfileService) {

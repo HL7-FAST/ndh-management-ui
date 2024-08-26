@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatCardModule } from '@angular/material/card';
@@ -28,10 +28,10 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 })
 export class AdminDashboardComponent implements OnInit {
 
-  serverStatuses: Array<{ url: string; status: 'pending' | 'online' | 'offline'; }> = [];
+  serverStatuses: { url: string; status: 'pending' | 'online' | 'offline'; }[] = [];
 
   
-  constructor(private configService: ConfigService, private resourceService: ResourceService) {
+  constructor(private configService: ConfigService, private resourceService: ResourceService<never>) {
   }
 
   ngOnInit(): void {
@@ -39,17 +39,18 @@ export class AdminDashboardComponent implements OnInit {
     this.serverStatuses = this.configService.availableBaseApiUrls.map(s => {return { url: s, status: 'pending' }});
 
     if (this.serverStatuses && this.serverStatuses.length > 0) {
-      for (let i = 0; i < this.serverStatuses.length; i++) {
-        this.resourceService.getCapabilityStatement(this.serverStatuses[i].url).subscribe({
+      // for (let i = 0; i < this.serverStatuses.length; i++) {
+      for (const serverStatus of this.serverStatuses) {
+        this.resourceService.getCapabilityStatement(serverStatus.url).subscribe({
           next: (data) => {
             if (data) {
-              this.serverStatuses[i].status = 'online';
+              serverStatus.status = 'online';
             } else {
-              this.serverStatuses[i].status = 'offline';
+              serverStatus.status = 'offline';
             }
           },
-          error: (err) => {
-            this.serverStatuses[i].status = 'offline';
+          error: () => {
+            serverStatus.status = 'offline';
           }
         });
       };

@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { OAuthModule } from 'angular-oauth2-oidc';
 import { BrowserModule } from '@angular/platform-browser';
-import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -29,6 +29,7 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ApiLogComponent } from "./components/core/api-log/api-log.component";
 import { MatBadgeModule } from '@angular/material/badge';
+import { UserToolbarComponent } from "./components/core/user-toolbar/user-toolbar.component";
 
 
 
@@ -36,32 +37,32 @@ import { MatBadgeModule } from '@angular/material/badge';
         AppComponent
     ],
     bootstrap: [AppComponent], imports: [OAuthModule.forRoot({
-            resourceServer: {
-                allowedUrls: [`${environment.baseApiUrls[0]}`],
-                sendAccessToken: true
-            }
-        }),
-        BrowserModule,
-        AppRoutingModule,
-        BrowserAnimationsModule,
-        AppRoutingModule,
-        LayoutModule,
-        MatToolbarModule,
-        MatTooltipModule,
-        MatExpansionModule,
-        MatButtonModule,
-        MatDialogModule,
-        MatSidenavModule,
-        MatIconModule,
-        MatListModule,
-        ThemePickerComponent,
-        MatMenuModule,
-        MatNativeDateModule,
-        LoadingIndicatorComponent,
-        AuthBypassComponent,
-        SettingsDialogComponent,
-        MatBadgeModule,
-        ApiLogComponent], providers: [
+        resourceServer: {
+            allowedUrls: [`${environment.baseApiUrls[0]}`],
+            sendAccessToken: true
+        }
+    }),
+    BrowserModule,
+    AppRoutingModule,
+    BrowserAnimationsModule,
+    AppRoutingModule,
+    LayoutModule,
+    MatToolbarModule,
+    MatTooltipModule,
+    MatExpansionModule,
+    MatButtonModule,
+    MatDialogModule,
+    MatSidenavModule,
+    MatIconModule,
+    MatListModule,
+    ThemePickerComponent,
+    MatMenuModule,
+    MatNativeDateModule,
+    LoadingIndicatorComponent,
+    AuthBypassComponent,
+    SettingsDialogComponent,
+    MatBadgeModule,
+    ApiLogComponent, UserToolbarComponent], providers: [
         StyleManagerService,
         httpInterceptorProviders,
         provideHttpClient(withInterceptorsFromDi())

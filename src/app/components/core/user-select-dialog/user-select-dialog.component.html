@@ -1,0 +1,16 @@
+<h2 mat-dialog-title>Select User Profile</h2>
+<mat-dialog-content>
+  <mat-action-list>
+    @for (profile of availableUserProfiles; track profile) {
+      <mat-list-item (click)="selectUserProfile(profile)">
+        <mat-icon matListItemIcon>person</mat-icon>
+        <div matListItemTitle>{{ profile.firstName }} {{ profile.lastName}}</div>
+        <div matListItemLine>{{ profile.email }}</div>
+        <div matListItemLine>{{ profile.description }}</div>
+      </mat-list-item>
+    }
+  </mat-action-list>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-button mat-dialog-close>Cancel</button>
+</mat-dialog-actions>

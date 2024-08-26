@@ -1,0 +1,45 @@
+<h1 mat-dialog-title class="dialog-form-header">{{data.dialogTitle}}</h1>
+<div mat-dialog-content>
+  <div>
+    <button mat-fab extended aria-label="Create a new verification result" matTooltip="Create VerificationResult" (click)="verify()">
+      <mat-icon>add</mat-icon>
+      Add Verification Result
+    </button>
+  </div>
+
+
+  @if (verificationResults && verificationResults.length) {}
+  @else {
+
+  }
+
+  <div class="table-container">
+    <table mat-table [dataSource]="verificationResults">
+
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef>FHIR ID</th>
+        <td mat-cell *matCellDef="let result">{{result.id}}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="date">
+        <th mat-header-cell *matHeaderCellDef>Date</th>
+        <td mat-cell *matCellDef="let result">{{result.statusDate}}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="who">
+        <th mat-header-cell *matHeaderCellDef>Who</th>
+        <td mat-cell *matCellDef="let result">{{ result.attestation?.who?.reference || 'unknown'  }}</td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="['id', 'date', 'who']"></tr>
+      <tr mat-row *matRowDef="let row; columns: ['id', 'date', 'who'];"></tr>
+
+    </table>
+    <app-fhir-paginator [pageSize]="pageSize" [pageSizeOptions]="[5, 10, 20, 50]" [nextLink]="nextLink"
+      [prevLink]="prevLink" (page)="fhirPagedEvent($event)">
+    </app-fhir-paginator>
+  </div>
+</div>
+<div mat-dialog-actions align="end">
+  <button mat-raised-button mat-dialog-close>Close</button>
+</div>

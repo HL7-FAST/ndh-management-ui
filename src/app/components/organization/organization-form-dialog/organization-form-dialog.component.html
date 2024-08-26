@@ -151,8 +151,8 @@
   <mat-checkbox *ngIf="isAttested(organization)" [(ngModel)]="resetAttestedChecked" style="margin-right: 0.5em;">Mark as unattested</mat-checkbox>
   
   <button mat-raised-button color="primary" [disabled]="organizationForm.invalid" (click)="onSubmit()">
-    <mat-icon>{{ formMode == FormMode.Create ? 'save' : 'save_as'}}</mat-icon>
-    {{ formMode == FormMode.Create ? 'Create' : 'Update'}} Organization
+    <mat-icon>{{ formMode === FormMode.Create ? 'save' : 'save_as'}}</mat-icon>
+    {{ formMode === FormMode.Create ? 'Create' : 'Update'}} Organization
   </button>
   <button mat-raised-button mat-dialog-close>Close</button>
 </div>

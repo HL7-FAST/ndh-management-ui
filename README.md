@@ -1,9 +1,15 @@
-# NDH Client
+# NDH Management Client
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 16.0.0.
+This project is a web app client built on Angular 18 to manage resources for the [National Directory of Healthcare Providers & Services (NDH)](https://build.fhir.org/ig/HL7/fhir-us-ndh/).
+
+This application is currently hosted in the HL7 Foundry at https://ndh-management-ui.fast.hl7.org/
+
+The corresponding FHIR server reference implementation is hosted at https://national-directory.fast.hl7.org/fhir with its source code available at https://github.com/hl7-fast/national-directory/tree/hapi
+
 
 ## Running locally
-1. Install [Node.js](https://nodejs.org) (tested on Node.js 18+)
+1. Install [Node.js](https://nodejs.org) 
+   - Check [Angular Version Compability](https://angular.dev/reference/versions) for guidance, generally v18+
 2. Clone the repository
     ```sh
     git clone https://github.com/HL7-FAST/ndh-management-ui/
@@ -55,63 +61,6 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
     ``` 
 3. The application is now running on http://localhost
 
-
-## Auth Code Flow Config
-You will need to configure your identity provider or remove the security from the project
-
-```
-import { AuthConfig } from 'angular-oauth2-oidc';
-
-export const authCodeFlowConfig: AuthConfig = {
-  // Url of the Identity Provider
-  issuer: '',
-
-  // URL of the SPA to redirect the user to after login
-  redirectUri: window.location.origin + '/',
-
-  loginUrl: window.location.origin + '/',
-
-  // The SPA's id. The SPA is registerd with this id at the auth-server
-  // clientId: 'server.code',
-  clientId: '',
-
-  // Just needed if your auth server demands a secret. In general, this
-  // is a sign that the auth server is not configured with SPAs in mind
-  // and it might not enforce further best practices vital for security
-  // such applications.
-  // dummyClientSecret: 'secret',
-  dummyClientSecret: '',
-
-  responseType: 'code',
-
-  // set the scope for the permissions the client should request
-  // The first four are defined by OIDC.
-  // Important: Request offline_access to get a refresh token
-  // The api scope is a usecase specific one
-  scope: 'openid profile email',
-
-  showDebugInformation: true,
-};
-```
-
-To disable security you can remove this section from `app.module.ts`
-
-```
-OAuthModule.forRoot({
-    resourceServer: {
-        allowedUrls: [`${environment.baseApiUrl}`],
-        sendAccessToken: true
-    }
-})
-```
-
-You will probably also want to remove the `AuthBypassInterceptor` from `interceptor.barrel.ts`. This interceptor is related to the `auth-bypass` component which allows requests to ignore the sceurity settings of the National Directory FHIR server. If you are using this against your own fhir server that does not have security enabled this will be uncessary and can be removed as well. The component can be found in the `app.module` imports as well as `app.component`.
-
-```
-<span class="toolbar-divider">
-    <app-auth-bypass></app-auth-bypass>
-</span>
-```
 
 
 ## Code scaffolding

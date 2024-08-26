@@ -24,7 +24,16 @@
 
       <ng-container matColumnDef="attested">
         <th mat-header-cell *matHeaderCellDef>Attested</th>
-        <td mat-cell *matCellDef="let organization"><mat-icon *ngIf="isAttested(organization)">verified</mat-icon></td>
+        <td mat-cell *matCellDef="let organization"><mat-icon *ngIf="isAttested(organization)">check_circle</mat-icon></td>
+      </ng-container>
+
+      <ng-container matColumnDef="verification">
+        <th mat-header-cell *matHeaderCellDef>Verification</th>
+        <td mat-cell *matCellDef="let record">
+          <button mat-button (click)="showVerificationDialog($event, record)">
+            {{ getVerificationStatus(record) }}
+          </button>
+        </td>
       </ng-container>
 
       <ng-container matColumnDef="actions">
@@ -43,18 +52,13 @@
       <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="showOrganizationViewDialog($event, row)"></tr>
 
     </table>
-    <mat-paginator [length]="totalCount"
-                [pageIndex]="pageNumber"
-                [pageSize]="pageSize"
-                [pageSizeOptions]="[5, 10, 20, 50]"
-                (page)="pagedEvent($event)"                 
-                aria-label="Select page of organizations">
-    </mat-paginator> 
+    <app-fhir-paginator [pageSize]="pageSize" [pageSizeOptions]="[5, 10, 20, 50]" [nextLink]="nextLink"
+      [prevLink]="prevLink" (page)="fhirPagedEvent($event)">
+    </app-fhir-paginator>
   </div>
   <ng-template #no_organizations_found>
     <div class="no-results-found-container">
-      <span>No organizations found for user {{ currentUser?.email }}.</span>
-      <app-attested-filter-warning></app-attested-filter-warning>
+      <span>No organizations found.</span>
     </div>
   </ng-template>
 

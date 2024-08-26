@@ -1,0 +1,52 @@
+
+<div class="fhir-paginator-container">
+
+  <div class="fhir-paginator-page-size">
+    <div class="mat-mdc-paginator-page-size-labelFFFFFFFF">
+      Items per page:
+    </div>
+    <mat-form-field class="mat-mdc-paginator-page-size-selectFFFFFFFFF" appearance="outline">
+      <mat-select [value]="pageSize" (selectionChange)="pageSizeChanged($event.value)">
+        @for (pageSizeOption of pageSizeOptions; track pageSizeOption) {
+          <mat-option [value]="pageSizeOption">{{pageSizeOption}}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  <div class="fhir-paginator-actions">
+    <button mat-icon-button (click)="previousPage()" [disabled]="isPreviousDisabled()" class="mat-mdc-paginator-navigation-previousFFFFFF">
+      <mat-icon>keyboard_arrow_left</mat-icon>
+    </button>
+    <button mat-icon-button (click)="nextPage()" [disabled]="isNextDisabled()" class="mat-mdc-paginator-navigation-nextFFFFFFF">
+      <mat-icon>keyboard_arrow_right</mat-icon>
+    </button>
+  </div>
+
+</div>
+
+<!-- <div class="mat-mdc-paginator-container">
+
+  <div class="mat-mdc-paginator-page-size">
+    <div class="mat-mdc-paginator-page-size-label">
+      Items per page:
+    </div>
+    <mat-form-field class="mat-mdc-paginator-page-size-select" appearance="outline">
+      <mat-select [value]="pageSize" (selectionChange)="pageSizeChanged($event.value)">
+        @for (pageSizeOption of pageSizeOptions; track pageSizeOption) {
+          <mat-option [value]="pageSizeOption">{{pageSizeOption}}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  <div class="mat-mdc-paginator-range-actions">
+    <button mat-icon-button (click)="previousPage()" [disabled]="isPreviousDisabled()" class="mat-mdc-paginator-navigation-previous">
+      <mat-icon>keyboard_arrow_left</mat-icon>
+    </button>
+    <button mat-icon-button (click)="nextPage()" [disabled]="isNextDisabled()" class="mat-mdc-paginator-navigation-next">
+      <mat-icon>keyboard_arrow_right</mat-icon>
+    </button>
+  </div>
+
+</div> -->

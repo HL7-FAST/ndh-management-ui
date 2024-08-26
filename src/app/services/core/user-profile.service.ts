@@ -1,27 +1,32 @@
 import { Injectable } from '@angular/core';
-import { OAuthService } from 'angular-oauth2-oidc';
-import { BehaviorSubject, Subject } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { IUserProfile } from 'src/app/interfaces/user-profile.interface';
 import { UserProfile } from 'src/app/models/user-pofile.model';
 import { SessionStorageService } from './session.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class UserProfileService {
+  private profileKey = 'user-profile';
+  public userProfileUpdated: BehaviorSubject<UserProfile|undefined>;
 
-  private profileKey: string = "user-profile";
-  public userProfileUpdated: BehaviorSubject<UserProfile>;
-
-  public userList: Array<UserProfile> = [
-    new UserProfile('HandleAttestation', 'handle@attestation.com', 'Test', 'User1', [''], [''], ['']),
-    new UserProfile('HandleAttestation2', 'handle2@attestation.com', 'Test', 'User2', [''], [''], ['']),
-    new UserProfile('HandleAttestation3', 'handle3@attestation.com', 'Test', 'User3', [''], [''], [''])
+  public userList: UserProfile[] = [
+    new UserProfile('addy.admin@example.123', 'Addy', 'Admin', ['admin'], '', [], 'User with admin role'),
+    new UserProfile('hanssolo@examplepract.123', 'Hans', 'Solo', [], 'HansSolo', [], 'Practioner with ID of "HansSolo"'),
+    new UserProfile('joesmith@examplepract.123', 'Joe', 'Smith', [], 'JoeSmith', [], 'Practitioner with ID of "JoeSmith"'),
+    new UserProfile('olivia.org@exampleorg.123', 'Olivia', 'Organization', ['org-admin'], '', ['Network1'], 'Admin for Organization with ID of "Network1"')
   ];
 
-  //private oauthService: OAuthService
-  constructor(private sessionStorageSrv: SessionStorageService) { 
-    this.userProfileUpdated = new BehaviorSubject<UserProfile>(this.getProfile());
+  constructor(private sessionStorageSrv: SessionStorageService) {
+    this.userProfileUpdated = new BehaviorSubject<UserProfile|undefined>(
+      this.getProfile()
+    );
+  }
+
+  clearProfile() {
+    this.sessionStorageSrv.removeItem(this.profileKey);
+    this.userProfileUpdated.next(undefined);
   }
 
   setProfile(profile: IUserProfile) {
@@ -29,16 +34,14 @@ export class UserProfileService {
     this.userProfileUpdated.next(profile);
   }
 
-  getProfile(): IUserProfile {
-    let profile = this.sessionStorageSrv.getItem(this.profileKey);
+  getProfile(): IUserProfile | undefined {
+    const profile = this.sessionStorageSrv.getItem(this.profileKey);
 
     if (profile) {
       return JSON.parse(profile) as IUserProfile;
-    }
-    else {
-      return this.userList[0]; 
     } 
-
+    
+    return undefined;
+    // return this.userList[0];
   }
-
 }

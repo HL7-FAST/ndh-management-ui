@@ -6,6 +6,8 @@ This application is currently hosted in the HL7 Foundry at https://ndh-managemen
 
 The corresponding FHIR server reference implementation is hosted at https://national-directory.fast.hl7.org/fhir with its source code available at https://github.com/hl7-fast/national-directory/tree/hapi
 
+## Foundry
+A live demo is hosted by [HL7 FHIR Foundry](https://foundry.hl7.org/products/56f11074-355e-46d1-b160-8ae498cea4e5).
 
 ## Running locally
 1. Install [Node.js](https://nodejs.org) 
